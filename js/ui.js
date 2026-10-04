@@ -263,11 +263,11 @@ export function pickWidget(defs, shared = []) {
       return btn;
     };
     const list = el('div', { className: 'picker' }, defs.map((def) => item(def.name, def.description ?? '', { def })));
-    const sharedList = shared.length ? [
-      el('h3', { className: 'picker-heading', textContent: t('picker_shared') }),
+    // ほかのレイアウトのウィジェットは、ふだんは折りたたんでおく(新しく置くことの方が多いので)
+    const sharedList = shared.length ? el('details', { className: 'picker-more' },
+      el('summary', {}, icon('chevron'), el('span', { textContent: t('picker_shared') })),
       el('p', { className: 'hint', textContent: t('picker_shared_hint') }),
-      el('div', { className: 'picker picker-shared' }, shared.map((w) => item(w.label, t('picker_shared_in', { layouts: w.where }), { shared: w }))),
-    ] : [];
+      el('div', { className: 'picker picker-shared' }, shared.map((w) => item(w.label, t('picker_shared_in', { layouts: w.where }), { shared: w })))) : null;
     const form = el('form', { method: 'dialog' },
       el('h2', { textContent: t('toolbar_add_widget') }),
       list,

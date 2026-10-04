@@ -602,6 +602,24 @@
   "timer_input_label": {
     "message": "カウントダウンの時間"
   },
+  "timer_hours_up": {
+    "message": "1時間増やす"
+  },
+  "timer_hours_down": {
+    "message": "1時間減らす"
+  },
+  "timer_minutes_up": {
+    "message": "1分増やす"
+  },
+  "timer_minutes_down": {
+    "message": "1分減らす"
+  },
+  "timer_seconds_up": {
+    "message": "1秒増やす"
+  },
+  "timer_seconds_down": {
+    "message": "1秒減らす"
+  },
   "timer_preset": {
     "message": "{n}分"
   },

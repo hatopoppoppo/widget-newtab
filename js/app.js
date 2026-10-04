@@ -316,9 +316,9 @@ function destroyWidget(inst) {
 // ---------- 操作 ----------
 
 async function addWidget() {
-  // ほかのレイアウトにだけ置かれているウィジェットも、ここに置ける(中身は共有)
+  // ほかのレイアウトにだけ置かれているウィジェットも、ここに置ける(中身は共有)。中身を持つもの(shareable)だけ
   const data = await store.loadAll();
-  const shared = data.widgets.filter((w) => !instances.has(w.id) && getWidget(w.type)).map((w) => ({
+  const shared = data.widgets.filter((w) => !instances.has(w.id) && getWidget(w.type)?.shareable).map((w) => ({
     ...w,
     label: data.configs[w.id]?.title || getWidget(w.type).name,
     where: layoutsUsing(data, w.id).map((l) => l.name).join(t('list_separator')),

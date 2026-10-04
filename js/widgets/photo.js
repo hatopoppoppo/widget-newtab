@@ -37,6 +37,7 @@ function pickFiles() {
 export default {
   type: 'photo',
   name: t('photo_name'),
+  shareable: true, // 中身を持つので、ほかのレイアウトにも同じものを置く意味がある
   description: t('photo_description'),
   size: { w: 6, h: 4, minW: 2, minH: 2 },
   defaults: {

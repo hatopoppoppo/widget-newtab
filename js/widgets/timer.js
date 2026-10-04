@@ -14,6 +14,12 @@ const MODES = { countdown: tr('timer_mode_countdown'), pomodoro: tr('timer_mode_
 const PRESETS = [1, 3, 5, 10, 30]; // カウントダウンの時間(分)
 const MAX_DURATION = (99 * 3600 + 59 * 60 + 59) * 1000;
 const RING = 2 * Math.PI * 45; // 円の周の長さ(viewBox 100 の半径 45)
+// 時・分・秒の ▲▼ で増減する秒数と、そのボタンの名前
+const STEPS = [
+  [3600, tr('timer_hours_up'), tr('timer_hours_down')],
+  [60, tr('timer_minutes_up'), tr('timer_minutes_down')],
+  [1, tr('timer_seconds_up'), tr('timer_seconds_down')],
+];
 
 // 時間になったときの音(表示中のタブだけで鳴らす)
 function chime() {
@@ -80,16 +86,58 @@ export default {
     const setter = el('div', { className: 'tm-set', tabIndex: 0, role: 'textbox', title: tr('timer_input_title') });
     setter.ariaLabel = tr('timer_input_label');
     let digits = '';
+    // 時・分・秒の 2 桁ずつを、上下の ▲▼ ボタンで挟む。ボタンは作り直さない(押し続けている間に消えないように)
+    const digitEls = Array.from({ length: MAX_DIGITS }, () => el('span', { className: 'tm-digit' }));
+    const colonEls = [];
+    STEPS.forEach(([unit, upLabel, downLabel], u) => {
+      if (u) {
+        const colon = el('span', { className: 'tm-colon', textContent: ':' });
+        colonEls.push(colon);
+        setter.append(colon);
+      }
+      setter.append(el('span', { className: 'tm-unit' },
+        stepButton('up', unit, upLabel), el('span', { className: 'tm-pair' }, digitEls.slice(u * 2, u * 2 + 2)), stepButton('down', -unit, downLabel)));
+    });
     const renderDigits = () => {
       const padded = digits.padStart(MAX_DIGITS, '0');
       const firstEntered = MAX_DIGITS - digits.length;
-      const parts = [];
-      for (let i = 0; i < MAX_DIGITS; i++) {
-        if (i && i % 2 === 0) parts.push(el('span', { className: i > firstEntered ? 'tm-colon on' : 'tm-colon', textContent: ':' }));
-        parts.push(el('span', { className: i >= firstEntered ? 'tm-digit on' : 'tm-digit', textContent: padded[i] }));
-      }
-      setter.replaceChildren(...parts);
+      digitEls.forEach((d, i) => {
+        d.textContent = padded[i];
+        d.classList.toggle('on', i >= firstEntered);
+      });
+      colonEls.forEach((c, k) => c.classList.toggle('on', (k + 1) * 2 > firstEntered));
     };
+    // ▲▼ は押し続けると繰り返す。入力欄にフォーカスを移さない(移すと入力中の扱いになるため)
+    function stepButton(dir, delta, label) {
+      const b = el('button', { type: 'button', className: `tm-step ${dir}`, tabIndex: -1, title: label });
+      b.ariaLabel = label;
+      let repeat = null;
+      const stop = () => {
+        clearTimeout(repeat);
+        repeat = null;
+      };
+      const step = () => {
+        const next = Math.min(MAX_DURATION, Math.max(0, digitsToDuration(digits) + delta * 1000));
+        digits = durationToDigits(next);
+        setDuration(next);
+        if (document.activeElement === setter) renderDigits(); // 入力中は render が数字を書き換えないので、ここで出す
+      };
+      b.addEventListener('mousedown', (e) => e.preventDefault());
+      b.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        b.setPointerCapture(e.pointerId);
+        step();
+        const loop = (wait) => {
+          repeat = setTimeout(() => {
+            step();
+            loop(80);
+          }, wait);
+        };
+        loop(400);
+      });
+      for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(type, stop);
+      return b;
+    }
     const setDigits = (next) => {
       digits = next.replace(/^0+/, '').slice(0, MAX_DIGITS);
       renderDigits();

@@ -51,6 +51,7 @@ async function editItem(item) {
 export default {
   type: 'todo',
   name: t('todo_name'),
+  shareable: true, // 中身を持つので、ほかのレイアウトにも同じものを置く意味がある
   description: t('todo_description'),
   size: { w: 6, h: 6, minW: 4, minH: 3 },
   defaults: { ...LIST_DEFAULTS },

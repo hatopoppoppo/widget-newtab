@@ -12,6 +12,7 @@ const NEW_MEMO = '__new';
 export default {
   type: 'memo',
   name: t('memo_name'),
+  shareable: true, // 中身を持つので、ほかのレイアウトにも同じものを置く意味がある
   description: t('memo_description'),
   size: { w: 6, h: 6, minW: 3, minH: 2 },
   defaults: {

@@ -73,6 +73,7 @@ async function editLink(link) {
 export default {
   type: 'links',
   name: t('links_name'),
+  shareable: true, // 中身を持つので、ほかのレイアウトにも同じものを置く意味がある
   description: t('links_description'),
   size: { w: 8, h: 4, minW: 2, minH: 1 },
   defaults: {

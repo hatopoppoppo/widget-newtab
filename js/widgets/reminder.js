@@ -63,6 +63,7 @@ function nextLabel(item, now = Date.now()) {
 export default {
   type: 'reminder',
   name: t('reminder_name'),
+  shareable: true, // 中身を持つので、ほかのレイアウトにも同じものを置く意味がある
   description: t('reminder_description'),
   size: { w: 6, h: 5, minW: 4, minH: 3 },
   defaults: { ...REMINDER_DEFAULTS },

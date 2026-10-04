@@ -5,6 +5,7 @@
 //   type: 'clock',                    // 保存データに使う一意な名前(変更しないこと)
 //   name: '日付時間',                  // 追加ダイアログ等での表示名
 //   description: '...',
+//   shareable?: true,                 // ほかのレイアウトにも同じもの(中身を共有)を置けるようにする(ToDo・メモなど中身を持つもの)
 //   size: { w, h, minW?, minH?, maxW?, maxH? },   // 24 列の正方形グリッド上の初期サイズ(マス数)
 //   defaults: { ... },                // 設定の初期値
 //   fields: [...] | (config) => [...],// 設定項目(ui.js の editSettings 参照)
