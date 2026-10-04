@@ -3,7 +3,7 @@
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo6i0T0/b0yQnUY7fvJXMkkXvSJPKItL/pcoFwkJdkAmkkyZ8CJv1u5VXcJgSbsGVadK9SRBkkkUzalZlsKT9JL3CCDLIhsAWso316x7xtnbqWNSZuOKB1wLxv0ya68CqUNwslYT5QJh6fgjSB9C39Ih1oHPgtcaPmtc+D+m2E4qsSrVxq/OXyL/l29B9OXl2k2JKQUA9lube3QoAj85BjdcA/WT9zI2OQBpaHOXehKInrxOOUoYKnWStWFvtty7s7Y3znwdAU0fasg7oahEcDEUTg7HGJv6e1Y2nQVn4Qc//Zlhh7RUxGkufqSzdoYxNvBZRD2OaX/R2h/fNya+emQIDAQAB",
   "name": "__MSG_app_name__",
   "default_locale": "ja",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "__MSG_app_description__",
   "icons": {
     "16": "icons/icon-16.png",
@@ -21,6 +21,7 @@
   "permissions": [
     "bookmarks",
     "storage",
+    "offscreen",
     "favicon",
     "search",
     "declarativeNetRequest",

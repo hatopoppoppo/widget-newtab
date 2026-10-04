@@ -153,6 +153,11 @@ async function onButton(notificationId, index) {
 
 // ---------- イベント ----------
 
+// 新規タブで終えたタイマーの音を、offscreen.html で鳴らす
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type === 'timer-chime-request') timer.requestChime(message.key);
+});
+
 chrome.alarms.onAlarm.addListener((alarm) => {
   // タイマー(ポモドーロ / カウントダウン)の終了。新規タブが先に処理していれば何もしない
   if (alarm.name.startsWith(timer.ALARM_PREFIX)) {

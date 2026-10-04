@@ -21,28 +21,6 @@ const STEPS = [
   [1, tr('timer_seconds_up'), tr('timer_seconds_down')],
 ];
 
-// 時間になったときの音(表示中のタブだけで鳴らす)
-function chime() {
-  try {
-    const ctx = new AudioContext();
-    for (let i = 0; i < 3; i++) {
-      const t = ctx.currentTime + i * 0.35;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(t);
-      osc.stop(t + 0.3);
-    }
-    setTimeout(() => ctx.close(), 1500);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
 export default {
   type: 'timer',
   name: tr('timer_name'),
@@ -260,7 +238,7 @@ export default {
       scheduleFinish();
     }
 
-    // 時間になったら、表示中なら音を鳴らして次の状態へ進める(バックグラウンドのアラームより早く反映するため)
+    // 時間になったら次の状態へ進める(バックグラウンドのアラームより早く反映するため)。音と通知は completeTimer が出す
     const finishTimers = {};
     function scheduleFinish() {
       for (const m of Object.keys(MODES)) {
@@ -268,9 +246,6 @@ export default {
         const { endsAt } = state[m];
         if (!endsAt) continue;
         finishTimers[m] = setTimeout(() => {
-          // タブを開いた時点ですでに過ぎていた分(閉じていた間に終わったもの)は鳴らさない
-          const fresh = Date.now() - endsAt < 5000;
-          if (fresh && cfg.sound && document.visibilityState === 'visible') chime();
           completeTimer(ctx.id, m);
         }, Math.max(0, endsAt - Date.now()) + 20); // 少し遅らせて、確実に終了時刻を過ぎてから処理する
       }

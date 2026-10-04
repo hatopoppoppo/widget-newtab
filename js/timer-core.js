@@ -23,7 +23,7 @@ export const TIMER_DEFAULTS = {
   longEvery: 4,      // 何回の作業ごとに長い休憩にするか
   autoStart: false,  // 終わったら次(休憩 / 作業)を自動で始める
   notify: true,
-  sound: true,       // 時間になったとき、表示中の新規タブで音を鳴らす
+  sound: true,       // 時間になったとき音を鳴らす(offscreen.html で。ほかのタブを見ていても鳴る)
 };
 
 export const PHASES = {
@@ -146,7 +146,37 @@ export async function loadTimerConfig(id) {
   return { ...TIMER_DEFAULTS, ...(await chrome.storage.sync.get(key))[key] };
 }
 
-// 時間になっていれば次の状態へ進めて通知する。進めたら true
+// ---------- 音 ----------
+// 音は offscreen.html で鳴らす(service worker では音を出せない。新規タブで鳴らすと、ほかのタブを見ているときに鳴らない)。
+// 新規タブからはバックグラウンドに頼み、バックグラウンドが offscreen.html を用意して渡す。
+// 同じ終了を両方が処理しても、key(id|mode|終了時刻)が同じなら offscreen.html が 1 回だけ鳴らす
+const LATE_CHIME = 5000;
+let creatingOffscreen = null;
+export async function requestChime(key) {
+  try {
+    if (globalThis.document) {
+      await chrome.runtime.sendMessage({ type: 'timer-chime-request', key });
+      return;
+    }
+    const url = chrome.runtime.getURL('offscreen.html');
+    const exists = (await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'], documentUrls: [url] })).length > 0;
+    if (!exists) {
+      creatingOffscreen ??= chrome.offscreen.createDocument({
+        url: 'offscreen.html',
+        reasons: ['AUDIO_PLAYBACK'],
+        justification: 'Play the timer alarm sound',
+      }).finally(() => {
+        creatingOffscreen = null;
+      });
+      await creatingOffscreen;
+    }
+    await chrome.runtime.sendMessage({ type: 'timer-chime', key });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// 時間になっていれば次の状態へ進めて、音を鳴らして通知する。進めたら true
 export async function completeTimer(id, mode, now = Date.now()) {
   const state = await loadTimer(id);
   const t = state[mode];
@@ -156,6 +186,8 @@ export async function completeTimer(id, mode, now = Date.now()) {
   const nextState = { ...state, [mode]: next };
   await saveTimer(id, nextState);
   await syncAlarms(id, nextState);
+  // 時間ちょうどに終えたときだけ鳴らす(Chrome を閉じていた間に過ぎた分は鳴らさない)
+  if (cfg.sound && now - t.endsAt < LATE_CHIME) await requestChime(`${id}|${mode}|${t.endsAt}`);
   if (notice && cfg.notify) {
     await chrome.notifications.create(alarmName(id, mode), {
       type: 'basic',

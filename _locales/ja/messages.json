@@ -594,7 +594,7 @@
     "message": "終わったら音を鳴らす"
   },
   "timer_sound_hint": {
-    "message": "新規タブを表示しているときだけ鳴ります。"
+    "message": "ほかのタブを見ているときも鳴ります。"
   },
   "timer_input_title": {
     "message": "数字で入力(130 → 1分30秒)"
