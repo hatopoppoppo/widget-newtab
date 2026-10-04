@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="memo_page_title"></title>
+  <link rel="icon" href="icons/icon-32.png">
+  <link rel="stylesheet" href="css/newtab.css">
+  <link rel="stylesheet" href="css/memo.css">
+  <script src="js/memo-page.js" type="module"></script>
+</head>
+<body class="memo-page">
+  <aside class="memo-side">
+    <div class="memo-side-head">
+      <input id="memo-filter" class="memo-filter" type="search" data-i18n-placeholder="memo_search" spellcheck="false">
+      <button id="new-memo" class="memo-icon-btn" type="button" data-i18n-title="memo_new"></button>
+    </div>
+    <ul id="memo-list" class="memo-list"></ul>
+    <p class="memo-side-note" data-i18n="memo_local_note"></p>
+  </aside>
+
+  <main class="memo-main">
+    <header class="memo-bar">
+      <button id="toggle-side" class="memo-icon-btn" type="button" data-i18n-title="memo_toggle_side"></button>
+      <span id="memo-status" class="memo-status"></span>
+      <div class="memo-modes" role="group" data-i18n-aria-label="memo_modes">
+        <button type="button" data-mode="edit" data-i18n-title="memo_mode_edit"></button>
+        <button type="button" data-mode="split" data-i18n-title="memo_mode_split"></button>
+        <button type="button" data-mode="preview" data-i18n-title="memo_mode_preview"></button>
+      </div>
+      <button id="delete-memo" class="memo-icon-btn" type="button" data-i18n-title="memo_delete"></button>
+    </header>
+    <div id="memo-panes" class="memo-panes">
+      <textarea id="memo-text" class="memo-text" spellcheck="false" data-i18n-placeholder="memo_text_placeholder"></textarea>
+      <div id="memo-preview" class="md memo-preview" data-i18n-data-placeholder="memo_preview"></div>
+    </div>
+  </main>
+</body>
+</html>

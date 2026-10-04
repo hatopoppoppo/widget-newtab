@@ -1,0 +1,1541 @@
+{
+  "locale": {
+    "message": "ja"
+  },
+  "app_name": {
+    "message": "Newtab Dashboard"
+  },
+  "app_description": {
+    "message": "新規タブを、自由に並べ替え・リサイズできるウィジェットのダッシュボードに置き換えます。"
+  },
+  "weekdays_short": {
+    "message": "日,月,火,水,木,金,土"
+  },
+  "common_settings": {
+    "message": "設定"
+  },
+  "common_delete": {
+    "message": "削除"
+  },
+  "common_edit": {
+    "message": "編集"
+  },
+  "common_cancel": {
+    "message": "キャンセル"
+  },
+  "common_save": {
+    "message": "保存"
+  },
+  "common_close": {
+    "message": "閉じる"
+  },
+  "common_undo": {
+    "message": "元に戻す"
+  },
+  "newtab_title": {
+    "message": "新しいタブ"
+  },
+  "toolbar_add_widget": {
+    "message": "ウィジェットを追加"
+  },
+  "toolbar_prefs": {
+    "message": "全体設定"
+  },
+  "toolbar_export": {
+    "message": "書き出し"
+  },
+  "toolbar_export_title": {
+    "message": "レイアウトと設定をJSONで保存"
+  },
+  "toolbar_import": {
+    "message": "読み込み"
+  },
+  "toolbar_import_title": {
+    "message": "JSONからレイアウトと設定を復元"
+  },
+  "newtab_empty": {
+    "message": "右上の ✎ ボタンから編集モードに入り、ウィジェットを追加してください。"
+  },
+  "common_show_frame": {
+    "message": "背景(カード)を表示"
+  },
+  "prefs_section_theme": {
+    "message": "テーマ"
+  },
+  "prefs_section_widget": {
+    "message": "ウィジェット"
+  },
+  "prefs_section_background": {
+    "message": "背景"
+  },
+  "prefs_section_integrations": {
+    "message": "外部連携"
+  },
+  "prefs_section_switchbot": {
+    "message": "SwitchBot"
+  },
+  "prefs_switchbot_token": {
+    "message": "トークン"
+  },
+  "prefs_switchbot_secret": {
+    "message": "クライアントシークレット"
+  },
+  "prefs_switchbot_hint": {
+    "message": "SwitchBotアプリの「プロフィール → 設定 → アプリバージョン」を10回タップすると出る「開発者向けオプション」で確認できます。このPCにだけ保存し、他のPCには同期しません。"
+  },
+  "prefs_theme": {
+    "message": "テーマ"
+  },
+  "prefs_theme_auto": {
+    "message": "OSの設定に合わせる"
+  },
+  "prefs_theme_light": {
+    "message": "ライト"
+  },
+  "prefs_theme_dark": {
+    "message": "ダーク"
+  },
+  "prefs_bg": {
+    "message": "背景色"
+  },
+  "prefs_accent": {
+    "message": "アクセントカラー"
+  },
+  "prefs_color_mode_theme": {
+    "message": "テーマの色"
+  },
+  "prefs_color_mode_custom": {
+    "message": "色を指定する"
+  },
+  "prefs_color": {
+    "message": "色"
+  },
+  "prefs_widget_bg": {
+    "message": "ウィジェットの背景色"
+  },
+  "prefs_widget_bg_hint": {
+    "message": "文字や枠線の色は、背景色の明るさに合わせて自動で変わります。"
+  },
+  "prefs_widget_opacity": {
+    "message": "ウィジェットの不透明度"
+  },
+  "prefs_widget_opacity_hint": {
+    "message": "下げると、ウィジェットの後ろの背景がぼやけて透けます。背景に画像やグラデーションを使うときに。"
+  },
+  "prefs_bg_type": {
+    "message": "背景"
+  },
+  "prefs_bg_type_theme": {
+    "message": "テーマの色"
+  },
+  "prefs_bg_type_color": {
+    "message": "単色"
+  },
+  "prefs_bg_type_gradient": {
+    "message": "グラデーション"
+  },
+  "prefs_bg_type_image": {
+    "message": "画像"
+  },
+  "prefs_gradient": {
+    "message": "グラデーション"
+  },
+  "gradient_kind": {
+    "message": "種類"
+  },
+  "gradient_kind_linear": {
+    "message": "線形"
+  },
+  "gradient_kind_radial": {
+    "message": "円形"
+  },
+  "gradient_kind_conic": {
+    "message": "扇形"
+  },
+  "gradient_shape": {
+    "message": "形"
+  },
+  "gradient_shape_ellipse": {
+    "message": "楕円"
+  },
+  "gradient_shape_circle": {
+    "message": "正円"
+  },
+  "gradient_angle": {
+    "message": "角度"
+  },
+  "gradient_center_x": {
+    "message": "中心(横)"
+  },
+  "gradient_center_y": {
+    "message": "中心(縦)"
+  },
+  "gradient_repeat": {
+    "message": "繰り返す"
+  },
+  "gradient_stop": {
+    "message": "選んだ色"
+  },
+  "gradient_stop_color": {
+    "message": "色を変える"
+  },
+  "gradient_stop_delete": {
+    "message": "この色を削除"
+  },
+  "gradient_stop_title": {
+    "message": "{n}番目の色({pos}%)"
+  },
+  "gradient_bar_title": {
+    "message": "クリックすると色を足せます"
+  },
+  "gradient_bar_hint": {
+    "message": "バーをクリックすると色を足せます。つまみはドラッグか矢印キーで動かし、Deleteキーで削除できます。"
+  },
+  "gradient_presets": {
+    "message": "見本"
+  },
+  "gradient_preset": {
+    "message": "見本{n}"
+  },
+  "prefs_bg_image": {
+    "message": "画像"
+  },
+  "bg_image_none": {
+    "message": "画像を選んでいません。"
+  },
+  "bg_image_saved": {
+    "message": "保存済みの画像"
+  },
+  "bg_image_pick": {
+    "message": "画像を選ぶ"
+  },
+  "bg_image_hint": {
+    "message": "画像はこのPCにだけ保存し、他のPCには同期しません。画像を選んでいないPCでは、テーマの色になります。"
+  },
+  "bg_image_failed": {
+    "message": "画像を読み込めませんでした。"
+  },
+  "prefs_bg_image_fit": {
+    "message": "画像の収め方"
+  },
+  "bg_image_fit_cover": {
+    "message": "画面いっぱいに広げる"
+  },
+  "bg_image_fit_contain": {
+    "message": "画像全体を表示する(余白は同じ画像のぼかし)"
+  },
+  "prefs_bg_image_dim": {
+    "message": "暗くする"
+  },
+  "prefs_bg_image_blur": {
+    "message": "ぼかす"
+  },
+  "prefs_margin": {
+    "message": "ウィジェットの間隔"
+  },
+  "prefs_reminder_notify": {
+    "message": "このPCでリマインダーの通知を出す"
+  },
+  "prefs_reminder_notify_hint": {
+    "message": "リマインダーは他のPCと同期されます。通知を出したくないPCではオフにしてください(この設定は同期されません)。"
+  },
+  "widget_unknown": {
+    "message": "不明なウィジェット({type})です。削除してください。"
+  },
+  "widget_error": {
+    "message": "表示中にエラーが発生しました: {message}"
+  },
+  "widget_confirm_delete": {
+    "message": "「{name}」を削除しますか?"
+  },
+  "widget_settings_title": {
+    "message": "{name}の設定"
+  },
+  "toolbar_done": {
+    "message": "完了"
+  },
+  "toolbar_done_title": {
+    "message": "編集を終了"
+  },
+  "toolbar_edit_title": {
+    "message": "レイアウトを編集"
+  },
+  "import_confirm": {
+    "message": "現在のレイアウトと設定を、読み込んだ内容で置き換えます。よろしいですか?"
+  },
+  "import_failed": {
+    "message": "読み込みに失敗しました: {message}"
+  },
+  "import_no_layout": {
+    "message": "layoutがありません"
+  },
+  "search_field_button": {
+    "message": "検索"
+  },
+  "search_field_selected": {
+    "message": "選択中: {label}"
+  },
+  "search_field_none": {
+    "message": "未選択"
+  },
+  "search_field_searching": {
+    "message": "検索中…"
+  },
+  "common_not_found": {
+    "message": "見つかりませんでした"
+  },
+  "search_field_failed": {
+    "message": "検索できませんでした: {message}"
+  },
+  "script_load_failed": {
+    "message": "{src}を読み込めませんでした"
+  },
+  "memo_untitled": {
+    "message": "無題のメモ"
+  },
+  "memo_page_title": {
+    "message": "メモ"
+  },
+  "memo_search": {
+    "message": "メモを検索"
+  },
+  "memo_new": {
+    "message": "新しいメモ"
+  },
+  "memo_local_note": {
+    "message": "メモはこのPCだけに保存されます"
+  },
+  "memo_toggle_side": {
+    "message": "一覧の表示 / 非表示"
+  },
+  "memo_modes": {
+    "message": "表示"
+  },
+  "memo_mode_edit": {
+    "message": "編集のみ"
+  },
+  "memo_mode_split": {
+    "message": "編集とプレビュー"
+  },
+  "memo_mode_preview": {
+    "message": "プレビューのみ"
+  },
+  "memo_delete": {
+    "message": "このメモを削除"
+  },
+  "memo_text_placeholder": {
+    "message": "Markdownで書けます(# 見出し、- リスト、- [ ] チェックボックスなど)"
+  },
+  "memo_preview": {
+    "message": "プレビュー"
+  },
+  "memo_page_title_with": {
+    "message": "{title} - メモ"
+  },
+  "memo_saved_at": {
+    "message": "保存済み({time})"
+  },
+  "memo_unsaved": {
+    "message": "未保存"
+  },
+  "memo_confirm_delete": {
+    "message": "「{title}」を削除しますか?\nこのメモを表示しているウィジェットは空になります。"
+  },
+  "memo_editing": {
+    "message": "編集中…"
+  },
+  "clock_name": {
+    "message": "日付時間"
+  },
+  "clock_description": {
+    "message": "任意のタイムゾーンの日付と時刻。複数置けば世界時計に"
+  },
+  "clock_local_tz": {
+    "message": "この端末のタイムゾーン({tz})"
+  },
+  "clock_timezone": {
+    "message": "タイムゾーン"
+  },
+  "clock_label": {
+    "message": "ラベル"
+  },
+  "clock_label_placeholder": {
+    "message": "空欄ならタイムゾーンの都市名(端末のタイムゾーンでは非表示)"
+  },
+  "clock_hour12": {
+    "message": "12時間表記"
+  },
+  "clock_show_seconds": {
+    "message": "秒を表示"
+  },
+  "clock_show_date": {
+    "message": "日付を表示"
+  },
+  "clock_show_offset": {
+    "message": "UTCとの時差を表示"
+  },
+  "search_name": {
+    "message": "検索"
+  },
+  "search_description": {
+    "message": "Google・Bing・DuckDuckGoなどを切り替えて検索"
+  },
+  "search_engine_chrome": {
+    "message": "Chromeの既定"
+  },
+  "search_placeholder": {
+    "message": "検索"
+  },
+  "search_engines": {
+    "message": "使う検索エンジン"
+  },
+  "search_custom": {
+    "message": "独自の検索エンジン"
+  },
+  "search_custom_hint": {
+    "message": "1行に1つずつ「名前 | URL」の形式で書いてください。URLの%sが検索語に置き換わります。"
+  },
+  "search_placeholder_label": {
+    "message": "入力欄のプレースホルダー"
+  },
+  "search_new_tab": {
+    "message": "検索結果を新しいタブで開く"
+  },
+  "search_engine_title": {
+    "message": "検索エンジン: {name}"
+  },
+  "search_engine_title_switch": {
+    "message": "検索エンジン: {name}(Ctrl + ↑↓でも切り替え)"
+  },
+  "bookmarks_name": {
+    "message": "ブックマーク"
+  },
+  "bookmarks_description": {
+    "message": "選んだフォルダのブックマークを一覧表示"
+  },
+  "bookmarks_bar": {
+    "message": "ブックマーク バー"
+  },
+  "bookmarks_untitled": {
+    "message": "(無題)"
+  },
+  "bookmarks_folder": {
+    "message": "フォルダ"
+  },
+  "bookmarks_show_title": {
+    "message": "見出しを表示"
+  },
+  "bookmarks_title": {
+    "message": "見出し"
+  },
+  "bookmarks_title_placeholder": {
+    "message": "空欄ならフォルダ名"
+  },
+  "bookmarks_new_tab": {
+    "message": "リンクを新しいタブで開く"
+  },
+  "bookmarks_bookmarklet": {
+    "message": "ブックマークレットは新規タブでは実行できません"
+  },
+  "bookmarks_folder_missing": {
+    "message": "フォルダが見つかりません。設定から選び直してください。"
+  },
+  "bookmarks_empty": {
+    "message": "ブックマークがありません"
+  },
+  "youtube_description": {
+    "message": "動画やプレイリストを埋め込んで再生"
+  },
+  "youtube_url": {
+    "message": "動画またはプレイリストのURL"
+  },
+  "youtube_url_hint": {
+    "message": "通常の動画・youtu.be・Shorts・ライブ・プレイリストのURLに対応しています。t=1m30sのような開始位置も使えます。"
+  },
+  "youtube_autoplay": {
+    "message": "新しいタブを開いたら自動再生"
+  },
+  "youtube_autoplay_hint": {
+    "message": "オフのときは、メモリを節約するため、サムネイルをクリックするまでプレーヤーを読み込みません。ブラウザの設定により、ミュートしないと自動再生されないことがあります。"
+  },
+  "youtube_mute": {
+    "message": "ミュートで開始"
+  },
+  "youtube_loop": {
+    "message": "ループ再生"
+  },
+  "youtube_controls": {
+    "message": "コントロールを表示"
+  },
+  "youtube_privacy": {
+    "message": "再生履歴を残さない(youtube-nocookie.com)"
+  },
+  "youtube_privacy_hint": {
+    "message": "オンにすると、ログイン状態(履歴・YouTube Premiumなど)が使われません。"
+  },
+  "youtube_bad_url": {
+    "message": "YouTubeのURLとして読み取れませんでした。設定を確認してください。"
+  },
+  "youtube_no_url": {
+    "message": "編集モードの ⚙ から、動画のURLを設定してください。"
+  },
+  "youtube_no_permission": {
+    "message": "YouTubeの再生に必要な権限が有効になっていません。chrome://extensionsでこの拡張機能を再読み込みしてから、新しいタブを開き直してください。"
+  },
+  "youtube_play": {
+    "message": "再生"
+  },
+  "youtube_playlist": {
+    "message": "プレイリスト"
+  },
+  "memo_name": {
+    "message": "メモ"
+  },
+  "memo_description": {
+    "message": "Markdownで書けるメモ。全画面のメモページでも編集できる(このPCだけに保存)"
+  },
+  "memo_select": {
+    "message": "表示するメモ"
+  },
+  "memo_untitled_unsaved": {
+    "message": "無題のメモ(未保存)"
+  },
+  "memo_new_option": {
+    "message": "+ 新しいメモ"
+  },
+  "memo_select_hint": {
+    "message": "メモはこのPCだけに保存され、他のPCには同期されません。"
+  },
+  "memo_show_tabs": {
+    "message": "メモを切り替えるタブを表示"
+  },
+  "memo_click_to_write": {
+    "message": "クリックしてメモを書く"
+  },
+  "memo_open_page": {
+    "message": "メモのページで開く"
+  },
+  "memo_back_to_view": {
+    "message": "表示に戻る"
+  },
+  "timer_phase_work": {
+    "message": "作業"
+  },
+  "timer_phase_short": {
+    "message": "休憩"
+  },
+  "timer_phase_long": {
+    "message": "長い休憩"
+  },
+  "timer_countdown_done_title": {
+    "message": "タイマーが終わりました"
+  },
+  "timer_countdown_done": {
+    "message": "{duration}のカウントダウンが終わりました"
+  },
+  "timer_break_title": {
+    "message": "{phase}しましょう"
+  },
+  "timer_break_message": {
+    "message": "作業{round}回目が終わりました。{phase}は{minutes}分です"
+  },
+  "timer_work_title": {
+    "message": "作業に戻りましょう"
+  },
+  "timer_work_message": {
+    "message": "{phase}が終わりました。作業は{minutes}分です"
+  },
+  "timer_unit_hours": {
+    "message": "{n}時間"
+  },
+  "timer_unit_minutes": {
+    "message": "{n}分"
+  },
+  "timer_unit_seconds": {
+    "message": "{n}秒"
+  },
+  "timer_mode_pomodoro": {
+    "message": "ポモドーロ"
+  },
+  "timer_mode_countdown": {
+    "message": "カウントダウン"
+  },
+  "timer_start": {
+    "message": "開始"
+  },
+  "timer_name": {
+    "message": "タイマー"
+  },
+  "timer_description": {
+    "message": "ポモドーロとカウントダウン。新規タブを閉じていても通知する"
+  },
+  "timer_work_minutes": {
+    "message": "作業(分)"
+  },
+  "timer_short_minutes": {
+    "message": "休憩(分)"
+  },
+  "timer_long_minutes": {
+    "message": "長い休憩(分)"
+  },
+  "timer_long_every": {
+    "message": "長い休憩までの作業の回数"
+  },
+  "timer_auto_start": {
+    "message": "ポモドーロの次(休憩 / 作業)を自動で始める"
+  },
+  "timer_notify": {
+    "message": "終わったら通知する"
+  },
+  "timer_notify_hint": {
+    "message": "新規タブを閉じていても通知します。"
+  },
+  "timer_sound": {
+    "message": "終わったら音を鳴らす"
+  },
+  "timer_sound_hint": {
+    "message": "新規タブを表示しているときだけ鳴ります。"
+  },
+  "timer_input_title": {
+    "message": "数字で入力(130 → 1分30秒)"
+  },
+  "timer_input_label": {
+    "message": "カウントダウンの時間"
+  },
+  "timer_preset": {
+    "message": "{n}分"
+  },
+  "timer_reset": {
+    "message": "リセット"
+  },
+  "timer_skip": {
+    "message": "スキップ"
+  },
+  "timer_skip_title": {
+    "message": "次の作業 / 休憩へ進む"
+  },
+  "timer_dots_title": {
+    "message": "{n}回ごとに長い休憩"
+  },
+  "timer_pause": {
+    "message": "一時停止"
+  },
+  "timer_resume": {
+    "message": "再開"
+  },
+  "links_name": {
+    "message": "リンク集"
+  },
+  "links_description": {
+    "message": "よく使うサイトを登録して並べる"
+  },
+  "links_edit": {
+    "message": "リンクを編集"
+  },
+  "links_add": {
+    "message": "リンクを追加"
+  },
+  "links_add_short": {
+    "message": "追加"
+  },
+  "links_title": {
+    "message": "名前"
+  },
+  "links_title_placeholder": {
+    "message": "空欄ならドメイン名"
+  },
+  "links_icon": {
+    "message": "アイコンのURL(任意)"
+  },
+  "links_icon_placeholder": {
+    "message": "空欄ならサイトから自動で取得"
+  },
+  "links_icon_hint": {
+    "message": "SVGやPNGの画像のURLを指定すると、自動で取得したアイコンの代わりに使います。"
+  },
+  "links_icon_hint_no_permission": {
+    "message": "高解像度アイコンの取得が許可されていないため、小さいアイコンで表示しています。chrome://extensionsの詳細の「サイトへのアクセス」から許可できます。"
+  },
+  "links_bad_url": {
+    "message": "URLの形式が正しくありません"
+  },
+  "links_bad_icon_url": {
+    "message": "アイコンのURLの形式が正しくありません"
+  },
+  "links_view": {
+    "message": "表示形式"
+  },
+  "links_view_grid": {
+    "message": "タイル"
+  },
+  "links_view_list": {
+    "message": "リスト"
+  },
+  "links_tile_span": {
+    "message": "タイルの大きさ"
+  },
+  "links_tile_span_option": {
+    "message": "{n}×{n}マス"
+  },
+  "links_icon_size": {
+    "message": "アイコンの大きさ"
+  },
+  "links_icon_small": {
+    "message": "小"
+  },
+  "links_icon_medium": {
+    "message": "中"
+  },
+  "links_icon_large": {
+    "message": "大"
+  },
+  "links_show_titles": {
+    "message": "名前を表示"
+  },
+  "links_heading": {
+    "message": "見出し"
+  },
+  "links_heading_placeholder": {
+    "message": "空欄なら非表示"
+  },
+  "links_show_add": {
+    "message": "「追加」ボタンを表示"
+  },
+  "links_show_add_hint": {
+    "message": "オフにしても、ページからリンクをドロップすれば追加できます。"
+  },
+  "links_max": {
+    "message": "リンクは{n}件までです"
+  },
+  "links_full": {
+    "message": "いっぱいです。広げると追加できます"
+  },
+  "links_more_title": {
+    "message": "ウィジェットを広げると残りのリンクが表示されます"
+  },
+  "links_empty": {
+    "message": "ページからリンクをドロップして追加できます"
+  },
+  "links_hidden": {
+    "message": "非表示"
+  },
+  "weather_name": {
+    "message": "天気"
+  },
+  "weather_description": {
+    "message": "今の天気と週間予報(Open-Meteo)"
+  },
+  "weather_code_clear": {
+    "message": "快晴"
+  },
+  "weather_code_mainly_clear": {
+    "message": "晴れ"
+  },
+  "weather_code_partly_cloudy": {
+    "message": "晴れ時々曇り"
+  },
+  "weather_code_overcast": {
+    "message": "曇り"
+  },
+  "weather_code_fog": {
+    "message": "霧"
+  },
+  "weather_code_rime_fog": {
+    "message": "霧(着氷)"
+  },
+  "weather_code_light_drizzle": {
+    "message": "弱い霧雨"
+  },
+  "weather_code_drizzle": {
+    "message": "霧雨"
+  },
+  "weather_code_dense_drizzle": {
+    "message": "強い霧雨"
+  },
+  "weather_code_freezing_drizzle": {
+    "message": "着氷性の霧雨"
+  },
+  "weather_code_light_rain": {
+    "message": "小雨"
+  },
+  "weather_code_rain": {
+    "message": "雨"
+  },
+  "weather_code_heavy_rain": {
+    "message": "大雨"
+  },
+  "weather_code_freezing_rain": {
+    "message": "着氷性の雨"
+  },
+  "weather_code_light_snow": {
+    "message": "小雪"
+  },
+  "weather_code_snow": {
+    "message": "雪"
+  },
+  "weather_code_heavy_snow": {
+    "message": "大雪"
+  },
+  "weather_code_snow_grains": {
+    "message": "霧雪"
+  },
+  "weather_code_showers": {
+    "message": "にわか雨"
+  },
+  "weather_code_violent_showers": {
+    "message": "激しいにわか雨"
+  },
+  "weather_code_snow_showers": {
+    "message": "にわか雪"
+  },
+  "weather_code_heavy_snow_showers": {
+    "message": "激しいにわか雪"
+  },
+  "weather_code_thunderstorm": {
+    "message": "雷雨"
+  },
+  "weather_code_thunderstorm_hail": {
+    "message": "雷雨(ひょう)"
+  },
+  "weather_code_unknown": {
+    "message": "不明"
+  },
+  "weather_place_separator": {
+    "message": "、"
+  },
+  "date_today": {
+    "message": "今日"
+  },
+  "date_tomorrow": {
+    "message": "明日"
+  },
+  "weather_mode": {
+    "message": "場所"
+  },
+  "weather_mode_search": {
+    "message": "地名で指定"
+  },
+  "weather_current_location": {
+    "message": "現在地"
+  },
+  "weather_place": {
+    "message": "地名"
+  },
+  "weather_place_placeholder": {
+    "message": "例: 東京、Osaka、札幌"
+  },
+  "weather_label": {
+    "message": "表示名"
+  },
+  "weather_label_placeholder": {
+    "message": "空欄なら地名(現在地なら「現在地」)"
+  },
+  "weather_units": {
+    "message": "単位"
+  },
+  "weather_units_celsius": {
+    "message": "摂氏(°C)・m/s"
+  },
+  "weather_units_fahrenheit": {
+    "message": "華氏(°F)・mph"
+  },
+  "weather_stale": {
+    "message": "{time}時点(更新できませんでした)"
+  },
+  "weather_updated": {
+    "message": "{time}更新"
+  },
+  "weather_high_low": {
+    "message": "最高 / 最低"
+  },
+  "weather_feels_like": {
+    "message": "体感"
+  },
+  "weather_humidity": {
+    "message": "湿度"
+  },
+  "weather_precipitation": {
+    "message": "降水確率"
+  },
+  "weather_wind": {
+    "message": "風"
+  },
+  "weather_no_place": {
+    "message": "編集モードの ⚙ から、場所を設定してください。"
+  },
+  "weather_loading": {
+    "message": "天気を取得しています…"
+  },
+  "weather_no_geo_permission": {
+    "message": "現在地を取得する権限がありません。chrome://extensionsでこの拡張機能を再読み込みするか、OSの位置情報の設定を確認してください。"
+  },
+  "weather_geo_failed": {
+    "message": "現在地を取得できませんでした。"
+  },
+  "weather_failed": {
+    "message": "天気を取得できませんでした({message})"
+  },
+  "piano_name": {
+    "message": "ピアノ"
+  },
+  "piano_description": {
+    "message": "クリックやキーボードで鳴らせるピアノ"
+  },
+  "piano_sound_piano": {
+    "message": "グランドピアノ"
+  },
+  "piano_sound_epiano": {
+    "message": "エレクトリックピアノ"
+  },
+  "piano_sound_organ": {
+    "message": "オルガン"
+  },
+  "piano_sound_triangle": {
+    "message": "シンセ(三角波)"
+  },
+  "piano_sound_sine": {
+    "message": "シンセ(サイン波)"
+  },
+  "piano_sound_square": {
+    "message": "チップチューン(矩形波)"
+  },
+  "piano_sound_sawtooth": {
+    "message": "シンセリード(ノコギリ波)"
+  },
+  "piano_wave": {
+    "message": "音色"
+  },
+  "piano_quality": {
+    "message": "音質"
+  },
+  "piano_quality_stereo": {
+    "message": "標準(ステレオ)"
+  },
+  "piano_quality_mono": {
+    "message": "省メモリ(モノラル)"
+  },
+  "piano_quality_hint": {
+    "message": "音質は低下しますが、メモリ消費を抑えられます。"
+  },
+  "piano_start_octave": {
+    "message": "開始オクターブ(4 = 中央のド)"
+  },
+  "piano_octaves": {
+    "message": "オクターブ数"
+  },
+  "piano_volume": {
+    "message": "音量"
+  },
+  "piano_release": {
+    "message": "余韻(鍵盤を離した後の長さ)"
+  },
+  "piano_release_unit": {
+    "message": "秒"
+  },
+  "piano_show_note_names": {
+    "message": "音名を表示"
+  },
+  "piano_show_key_labels": {
+    "message": "PCキーボードの割り当てを表示"
+  },
+  "piano_show_key_labels_hint": {
+    "message": "ピアノをクリックしてから、Z〜M / Q〜Iのキーで弾けます。← → でオクターブを移動できます。"
+  },
+  "piano_show_octave_controls": {
+    "message": "オクターブ移動ボタンを表示"
+  },
+  "piano_remember_octave": {
+    "message": "オクターブ移動の位置を保存する"
+  },
+  "piano_remember_octave_hint": {
+    "message": "オフにすると、新しいタブを開くたびに開始オクターブに戻ります。"
+  },
+  "piano_octave_down": {
+    "message": "1オクターブ下へ(←)"
+  },
+  "piano_octave_up": {
+    "message": "1オクターブ上へ(→)"
+  },
+  "piano_loading": {
+    "message": "音源を読み込み中…"
+  },
+  "piano_load_failed": {
+    "message": "音源の読み込みに失敗しました"
+  },
+  "piano_tone_failed": {
+    "message": "Tone.jsを読み込めませんでした"
+  },
+  "list_separator": {
+    "message": "・"
+  },
+  "date_yesterday": {
+    "message": "昨日"
+  },
+  "date_md": {
+    "message": "{month}/{day}({weekday})"
+  },
+  "date_ymd": {
+    "message": "{year}/{month}/{day}({weekday})"
+  },
+  "date_with_time": {
+    "message": "{date} {time}"
+  },
+  "repeat_daily": {
+    "message": "毎日"
+  },
+  "repeat_daily_n": {
+    "message": "{n}日ごと"
+  },
+  "repeat_weekdays": {
+    "message": "平日"
+  },
+  "repeat_weekly": {
+    "message": "毎週"
+  },
+  "repeat_weekly_n": {
+    "message": "{n}週間ごと"
+  },
+  "repeat_monthly": {
+    "message": "毎月"
+  },
+  "repeat_monthly_n": {
+    "message": "{n}か月ごと"
+  },
+  "repeat_yearly": {
+    "message": "毎年"
+  },
+  "repeat_yearly_n": {
+    "message": "{n}年ごと"
+  },
+  "repeat_weekly_days": {
+    "message": "{every}({days})"
+  },
+  "repeat_monthly_day": {
+    "message": "{every}{day}日"
+  },
+  "repeat_yearly_date": {
+    "message": "{every}{month}/{day}"
+  },
+  "repeat_nth": {
+    "message": "第{n}"
+  },
+  "repeat_nth_last": {
+    "message": "最終"
+  },
+  "repeat_nth_weekday": {
+    "message": "{every}{nths}{weekdays}曜"
+  },
+  "repeat_until": {
+    "message": "{text} {date}まで"
+  },
+  "repeat_preview_day": {
+    "message": "{day}({weekday})"
+  },
+  "repeat_preview_line": {
+    "message": "{month}月: {days}"
+  },
+  "repeat_preview_none": {
+    "message": "なし"
+  },
+  "repeat_preview_choose": {
+    "message": "週と曜日を選んでください"
+  },
+  "repeat_option_none": {
+    "message": "繰り返さない"
+  },
+  "repeat_option_daily": {
+    "message": "毎日"
+  },
+  "repeat_option_weekdays": {
+    "message": "平日(月〜金)"
+  },
+  "repeat_option_weekly": {
+    "message": "毎週"
+  },
+  "repeat_option_monthly": {
+    "message": "毎月(日付)"
+  },
+  "repeat_option_nthweekday": {
+    "message": "毎月(第n◯曜日)"
+  },
+  "repeat_option_yearly": {
+    "message": "毎年"
+  },
+  "repeat_field_freq": {
+    "message": "繰り返し"
+  },
+  "repeat_field_every": {
+    "message": "間隔(2なら2日 / 2週 / 2か月 / 2年ごと)"
+  },
+  "repeat_field_weekdays": {
+    "message": "曜日"
+  },
+  "repeat_field_days_hint": {
+    "message": "選ばなければ日付の曜日"
+  },
+  "repeat_field_nths": {
+    "message": "週"
+  },
+  "repeat_field_preview": {
+    "message": "直近の日付"
+  },
+  "repeat_field_until": {
+    "message": "繰り返しの終了日(任意)"
+  },
+  "reminder_name": {
+    "message": "リマインダー"
+  },
+  "field_text": {
+    "message": "内容"
+  },
+  "reminder_field_date": {
+    "message": "日付"
+  },
+  "reminder_field_day": {
+    "message": "日にち"
+  },
+  "reminder_field_time": {
+    "message": "時刻"
+  },
+  "reminder_month_day": {
+    "message": "毎月{day}日"
+  },
+  "reminder_month_day_hint": {
+    "message": "その日が無い月は月末に通知します"
+  },
+  "reminder_year_day": {
+    "message": "毎年{month}月{day}日"
+  },
+  "reminder_description": {
+    "message": "決めた日時に通知する。毎日・毎週・毎月第n◯曜日などの繰り返しもできる"
+  },
+  "reminder_edit": {
+    "message": "リマインダーを編集"
+  },
+  "reminder_add": {
+    "message": "リマインダーを追加"
+  },
+  "reminder_create": {
+    "message": "リマインダーを作る"
+  },
+  "reminder_field_list": {
+    "message": "追加先"
+  },
+  "reminder_no_widget": {
+    "message": "リマインダーのウィジェットを置いてください(✎ の「ウィジェットを追加」)"
+  },
+  "reminder_full_elsewhere": {
+    "message": "リマインダーがいっぱいです。終わったものを消してください"
+  },
+  "reminder_created": {
+    "message": "リマインダーを作りました({next})"
+  },
+  "reminder_ended": {
+    "message": "終了"
+  },
+  "reminder_paused": {
+    "message": "停止中"
+  },
+  "reminder_title": {
+    "message": "名前"
+  },
+  "reminder_snooze": {
+    "message": "「再通知」までの時間"
+  },
+  "reminder_hide_ended": {
+    "message": "終わったものを隠す"
+  },
+  "reminder_input": {
+    "message": "リマインダーを追加…"
+  },
+  "reminder_full": {
+    "message": "これ以上保存できません。終わったものを消してください"
+  },
+  "common_next": {
+    "message": "次回: {next}"
+  },
+  "common_deleted": {
+    "message": "「{name}」を削除しました"
+  },
+  "reminder_bell_ended": {
+    "message": "終了しました"
+  },
+  "reminder_bell_resume": {
+    "message": "通知を再開する"
+  },
+  "reminder_bell_pause": {
+    "message": "通知を止める(再開するまで通知しない)"
+  },
+  "common_click_to_edit": {
+    "message": "クリックで編集"
+  },
+  "reminder_snoozing": {
+    "message": "再通知 {time}"
+  },
+  "common_count": {
+    "message": "{n}件"
+  },
+  "reminder_empty": {
+    "message": "リマインダーはありません"
+  },
+  "reminder_clear_ended": {
+    "message": "終わったもの{n}件を消す"
+  },
+  "reminder_cleared_ended": {
+    "message": "終わったもの{n}件を消しました"
+  },
+  "todo_name": {
+    "message": "ToDo"
+  },
+  "todo_description": {
+    "message": "期限・繰り返しつきのToDoリスト"
+  },
+  "todo_edit": {
+    "message": "ToDoを編集"
+  },
+  "todo_due": {
+    "message": "期限"
+  },
+  "todo_due_time": {
+    "message": "時刻(空欄なら日付だけ)"
+  },
+  "todo_list_title": {
+    "message": "リストの名前"
+  },
+  "todo_sort": {
+    "message": "並び順"
+  },
+  "todo_sort_manual": {
+    "message": "手動(ドラッグで並べ替え)"
+  },
+  "todo_sort_due": {
+    "message": "期限が近い順"
+  },
+  "todo_hide_done": {
+    "message": "完了済みを隠す"
+  },
+  "todo_input": {
+    "message": "ToDoを追加…"
+  },
+  "todo_full": {
+    "message": "これ以上保存できません。完了済みを消してください"
+  },
+  "todo_undone": {
+    "message": "未完了に戻す"
+  },
+  "todo_done_repeat": {
+    "message": "完了(次回の期限に進む)"
+  },
+  "todo_done": {
+    "message": "完了"
+  },
+  "todo_empty_open": {
+    "message": "未完了のToDoはありません"
+  },
+  "todo_empty": {
+    "message": "ToDoはありません"
+  },
+  "todo_clear_done": {
+    "message": "完了済み{n}件を消す"
+  },
+  "todo_cleared_done": {
+    "message": "完了済み{n}件を消しました"
+  },
+  "reminder_notify_snooze": {
+    "message": "{n}分後に再通知"
+  },
+  "reminder_notify_stop": {
+    "message": "今後は通知しない"
+  },
+  "reminder_missed": {
+    "message": "見逃したリマインダーが{n}件あります"
+  },
+  "reminder_missed_item": {
+    "message": "・{text}"
+  },
+  "photo_name": {
+    "message": "写真"
+  },
+  "photo_description": {
+    "message": "選んだ写真を表示します。複数あればスライドショーで切り替えます。"
+  },
+  "photo_fit": {
+    "message": "写真の収め方"
+  },
+  "photo_fit_auto": {
+    "message": "自動"
+  },
+  "photo_fit_cover": {
+    "message": "切り抜いて枠いっぱいに広げる"
+  },
+  "photo_fit_contain": {
+    "message": "写真全体を表示する"
+  },
+  "photo_fit_hint": {
+    "message": "自動では、切り抜く部分が少ない写真は枠いっぱいに広げ、縦長と横長のように形が大きく違う写真は全体を表示します。全体を表示したときの余白には、同じ写真をぼかして敷きます。"
+  },
+  "photo_interval": {
+    "message": "切り替える間隔"
+  },
+  "photo_interval_off": {
+    "message": "切り替えない"
+  },
+  "photo_interval_seconds": {
+    "message": "{n}秒"
+  },
+  "photo_interval_minutes": {
+    "message": "{n}分"
+  },
+  "photo_interval_hours": {
+    "message": "{n}時間"
+  },
+  "photo_order": {
+    "message": "切り替える順番"
+  },
+  "photo_order_sequential": {
+    "message": "追加した順"
+  },
+  "photo_order_random": {
+    "message": "ランダム"
+  },
+  "photo_empty": {
+    "message": "写真がありません。"
+  },
+  "photo_empty_hint": {
+    "message": "ファイルをここにドロップしても追加できます。写真はこのPCにだけ保存し、他のPCには同期しません。"
+  },
+  "photo_add": {
+    "message": "写真を追加"
+  },
+  "photo_delete": {
+    "message": "この写真を削除"
+  },
+  "photo_confirm_delete": {
+    "message": "この写真を削除しますか？"
+  },
+  "photo_prev": {
+    "message": "前の写真"
+  },
+  "photo_next": {
+    "message": "次の写真"
+  },
+  "photo_adding": {
+    "message": "写真を追加しています({done}/{total})"
+  },
+  "photo_add_failed": {
+    "message": "{n}枚の写真を読み込めませんでした。"
+  },
+  "switchbot_description": {
+    "message": "SwitchBotハブに赤外線リモコンとして登録した照明とエアコンを操作します。"
+  },
+  "switchbot_devices": {
+    "message": "操作する機器"
+  },
+  "switchbot_devices_hint": {
+    "message": "SwitchBotアプリで赤外線リモコンとして登録した照明とエアコンが並びます。"
+  },
+  "switchbot_no_remotes": {
+    "message": "操作できる照明・エアコンがありません。SwitchBotアプリで、ハブに赤外線リモコンを登録してください。"
+  },
+  "switchbot_device_label": {
+    "message": "{name}({kind})"
+  },
+  "switchbot_kind_light": {
+    "message": "照明"
+  },
+  "switchbot_kind_diy_light": {
+    "message": "照明(DIY)"
+  },
+  "switchbot_kind_ac": {
+    "message": "エアコン"
+  },
+  "switchbot_kind_diy_ac": {
+    "message": "エアコン(DIY)"
+  },
+  "switchbot_no_token": {
+    "message": "全体設定の「外部連携 → SwitchBot」で、トークンとクライアントシークレットを入力してください。"
+  },
+  "switchbot_no_devices": {
+    "message": "設定(⚙)で、操作する機器を選んでください。"
+  },
+  "switchbot_missing": {
+    "message": "選んだ機器が見つかりません。SwitchBotアプリで削除された可能性があります。"
+  },
+  "switchbot_network_error": {
+    "message": "SwitchBotに接続できませんでした。"
+  },
+  "switchbot_auth_failed": {
+    "message": "SwitchBotの認証に失敗しました。トークンとクライアントシークレットを確かめてください。"
+  },
+  "switchbot_error": {
+    "message": "SwitchBotでエラーが起きました({message})"
+  },
+  "switchbot_on": {
+    "message": "つける"
+  },
+  "switchbot_off": {
+    "message": "消す"
+  },
+  "switchbot_brighter": {
+    "message": "明るく"
+  },
+  "switchbot_darker": {
+    "message": "暗く"
+  },
+  "switchbot_temp_down": {
+    "message": "温度を下げる"
+  },
+  "switchbot_temp_up": {
+    "message": "温度を上げる"
+  },
+  "switchbot_temp": {
+    "message": "{temp}℃"
+  },
+  "switchbot_mode": {
+    "message": "モード"
+  },
+  "switchbot_mode_auto": {
+    "message": "自動"
+  },
+  "switchbot_mode_cool": {
+    "message": "冷房"
+  },
+  "switchbot_mode_dry": {
+    "message": "除湿"
+  },
+  "switchbot_mode_fan": {
+    "message": "送風"
+  },
+  "switchbot_mode_heat": {
+    "message": "暖房"
+  },
+  "switchbot_fan": {
+    "message": "風量"
+  },
+  "switchbot_fan_auto": {
+    "message": "自動"
+  },
+  "switchbot_fan_low": {
+    "message": "弱"
+  },
+  "switchbot_fan_medium": {
+    "message": "中"
+  },
+  "switchbot_fan_high": {
+    "message": "強"
+  },
+  "switchbot_sending": {
+    "message": "送信中…"
+  },
+  "switchbot_sent": {
+    "message": "{time}に送信しました"
+  },
+  "layout_default_name": {
+    "message": "メイン"
+  },
+  "toolbar_layouts": {
+    "message": "レイアウト"
+  },
+  "toolbar_layouts_title": {
+    "message": "レイアウトの切り替え・追加・複製・名前の変更・削除"
+  },
+  "layouts_title": {
+    "message": "レイアウト"
+  },
+  "layouts_list": {
+    "message": "レイアウトの一覧"
+  },
+  "layouts_hint": {
+    "message": "レイアウトごとに、ウィジェットの配置と全体設定(テーマ・色・背景)を切り替えられます。同じウィジェットを複数のレイアウトに置くと、中身は共有されます。表示するレイアウトはPCごとに選べます。"
+  },
+  "layouts_name": {
+    "message": "レイアウトの名前"
+  },
+  "layouts_new": {
+    "message": "新しいレイアウト"
+  },
+  "layouts_new_name": {
+    "message": "レイアウト{n}"
+  },
+  "layouts_copy_name": {
+    "message": "{name}のコピー"
+  },
+  "layouts_duplicate": {
+    "message": "複製"
+  },
+  "layouts_current": {
+    "message": "表示中"
+  },
+  "layouts_max": {
+    "message": "レイアウトは{n}個までです。"
+  },
+  "widget_confirm_remove_shared": {
+    "message": "「{name}」をこのレイアウトから外しますか？ほかのレイアウト({layouts})には残ります。"
+  },
+  "picker_shared": {
+    "message": "ほかのレイアウトのウィジェット"
+  },
+  "picker_shared_hint": {
+    "message": "同じウィジェットを置くと、中身は共有されます。"
+  },
+  "picker_shared_in": {
+    "message": "{layouts}に配置"
+  },
+  "layouts_manage": {
+    "message": "レイアウトを管理…"
+  },
+  "update_available": {
+    "message": "新しいバージョン{version}"
+  },
+  "update_available_title": {
+    "message": "更新のしかたを表示します"
+  },
+  "update_title": {
+    "message": "新しいバージョンがあります"
+  },
+  "update_versions": {
+    "message": "今のバージョンは{current}、最新は{latest}です。"
+  },
+  "update_step_files": {
+    "message": "拡張機能のフォルダを新しいファイルにします。gitで入れた場合はgit pullを、ZIPで入れた場合は新しいZIPを解凍して、同じフォルダに上書きしてください。"
+  },
+  "update_step_reload": {
+    "message": "「再読み込み」を押すと、新しいバージョンに切り替わります。設定とデータはそのまま残ります。"
+  },
+  "update_download_zip": {
+    "message": "ZIPをダウンロード"
+  },
+  "update_open_repo": {
+    "message": "GitHubを開く"
+  },
+  "update_reload": {
+    "message": "再読み込み"
+  },
+  "update_reload_hint": {
+    "message": "ファイルを入れ替えたあとに押すと、拡張機能を読み込み直します。"
+  },
+  "update_dismiss": {
+    "message": "このバージョンは知らせない"
+  },
+  "prefs_about": {
+    "message": "バージョン"
+  },
+  "update_current": {
+    "message": "バージョン{version}"
+  },
+  "update_check": {
+    "message": "更新を確認"
+  },
+  "update_checking": {
+    "message": "確認しています…"
+  },
+  "update_latest": {
+    "message": "最新のバージョンです。"
+  },
+  "update_found": {
+    "message": "新しいバージョン{version}があります。"
+  },
+  "update_check_failed": {
+    "message": "更新を確認できませんでした。"
+  }
+}

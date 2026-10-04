@@ -1,0 +1,116 @@
+/* メモのページ(memo.html)。テーマの色や .md は newtab.css のものを使う */
+
+body.memo-page {
+  display: flex;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---------- 一覧 ---------- */
+
+.memo-side {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+  border-right: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.side-hidden .memo-side { display: none; }
+
+.memo-side-head { display: flex; gap: 6px; padding: 12px 10px 8px; }
+.memo-filter {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.memo-filter:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+
+.memo-list { flex: 1; margin: 0; padding: 0 6px 8px; overflow: auto; list-style: none; }
+.memo-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.memo-item:hover { background: var(--surface-hover); }
+.memo-item.active { background: var(--accent-soft); }
+.memo-item-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.memo-item-date { flex: none; color: var(--text-muted); font-size: 12px; }
+.memo-list-empty { padding: 8px 10px; color: var(--text-muted); font-size: 13px; }
+.memo-side-note { margin: 0; padding: 8px 14px 12px; color: var(--text-muted); font-size: 12px; }
+
+/* ---------- 本体 ---------- */
+
+.memo-main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
+
+.memo-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+.memo-status { flex: 1; color: var(--text-muted); font-size: 12px; }
+
+.memo-icon-btn, .memo-modes button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.memo-icon-btn:hover, .memo-modes button:hover { background: var(--surface-hover); color: var(--text); }
+.memo-side-head .memo-icon-btn { border-color: var(--border); background: var(--surface); }
+.memo-modes { display: flex; padding: 2px; border: 1px solid var(--border); border-radius: 10px; }
+.memo-modes button { width: 30px; height: 28px; }
+.memo-modes button.active { background: var(--accent-soft); color: var(--accent); }
+#delete-memo:hover { color: #dc2626; }
+
+.memo-panes { flex: 1; display: flex; min-height: 0; }
+.memo-panes .memo-text, .memo-panes .memo-preview { flex: 1; min-width: 0; overflow: auto; }
+.memo-panes .memo-text {
+  padding: 20px 24px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: 14px/1.7 ui-monospace, "Cascadia Code", Consolas, "BIZ UDGothic", monospace;
+  resize: none;
+  outline: none;
+}
+.memo-panes .memo-preview { padding: 20px 28px; font-size: 15px; }
+.memo-panes .memo-preview.empty::before { content: attr(data-placeholder); color: var(--text-muted); }
+.memo-panes[data-mode="split"] .memo-preview { border-left: 1px solid var(--border); }
+.memo-panes[data-mode="edit"] .memo-preview,
+.memo-panes[data-mode="preview"] .memo-text { display: none; }
+/* 1 画面で読むときは行を長くしすぎない */
+.memo-panes[data-mode="preview"] .memo-preview > * { max-width: 860px; margin-inline: auto; }
+.memo-panes[data-mode="edit"] .memo-text { padding-inline: max(24px, calc((100% - 860px) / 2)); }
+
+@media (max-width: 720px) {
+  .memo-side { position: fixed; inset: 0 auto 0 0; z-index: 10; box-shadow: var(--shadow); }
+  .memo-panes[data-mode="split"] { flex-direction: column; }
+  .memo-panes[data-mode="split"] .memo-preview { border-left: 0; border-top: 1px solid var(--border); }
+}

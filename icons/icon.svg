@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f86f0"/>
+      <stop offset="1" stop-color="#2f5bd0"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bg)"/>
+  <!-- 大きさの違うタイル = 自由に並べたウィジェット -->
+  <rect x="24" y="24" width="46" height="34" rx="8" fill="#fff"/>
+  <rect x="78" y="24" width="26" height="34" rx="8" fill="#fff" opacity=".75"/>
+  <rect x="24" y="66" width="26" height="38" rx="8" fill="#fff" opacity=".75"/>
+  <rect x="58" y="66" width="46" height="38" rx="8" fill="#fff"/>
+</svg>
