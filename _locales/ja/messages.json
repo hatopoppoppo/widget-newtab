@@ -1532,6 +1532,24 @@
   "update_reload_hint": {
     "message": "ファイルを入れ替えたあとに押すと、拡張機能を読み込み直します。"
   },
+  "update_now": {
+    "message": "今すぐ更新"
+  },
+  "update_updating": {
+    "message": "新しいファイルに入れ替えています…"
+  },
+  "update_done": {
+    "message": "バージョン{version}に更新しました。読み込み直します…"
+  },
+  "update_auto_failed": {
+    "message": "更新できませんでした({error})。下の手順で更新してください。"
+  },
+  "update_manual": {
+    "message": "手で更新する"
+  },
+  "update_helper_hint": {
+    "message": "拡張機能のフォルダの「native」にあるinstall.batを一度実行しておくと、ここから「今すぐ更新」でファイルの入れ替えまでできます(Windowsだけ)。"
+  },
   "update_dismiss": {
     "message": "このバージョンは知らせない"
   },

@@ -1562,6 +1562,11 @@ body {
 .update-links { display: flex; flex-wrap: wrap; gap: 6px; }
 .update-links .btn { text-decoration: none; }
 .update-dialog .actions { justify-content: flex-end; gap: 8px; }
+.update-auto { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 12px; }
+.update-status { margin: 0; color: var(--text-muted); font-size: 13px; }
+.update-manual { margin: 0 0 8px; }
+.update-manual > summary { margin-bottom: 8px; color: var(--text-muted); cursor: pointer; }
+.update-helper-hint { margin: 8px 0 0; font-size: 12px; color: var(--text-muted); }
 .about { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .about-version { margin-right: 4px; font-variant-numeric: tabular-nums; }
 .about .btn { padding: 6px 12px; }

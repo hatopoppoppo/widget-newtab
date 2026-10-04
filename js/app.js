@@ -7,7 +7,7 @@ import { applyTheme } from './theme.js';
 import { applyBackground, backgroundImageField, saveBackgroundPhoto, onBackgroundPhotoChange } from './page-bg.js';
 import { layoutListField } from './layouts-ui.js';
 import * as photos from './photo-store.js';
-import { checkForUpdate, dismissUpdate, reloadExtension, ZIP_URL, REPO_URL } from './update.js';
+import { checkForUpdate, dismissUpdate, reloadExtension, helperAvailable, updateWithHelper, ZIP_URL, REPO_URL } from './update.js';
 
 // 全ウィジェット共通の設定項目
 const COMMON_DEFAULTS = { frame: true };
@@ -635,22 +635,50 @@ function showUpdateNotice(result) {
   if (notice.hidden) return;
   notice.replaceChildren(icon('download'), el('span', { textContent: t('update_available', { version: result.latest }) }));
   notice.onclick = () => openUpdateDialog(result);
+  helperCheck ??= helperAvailable(); // ダイアログを開く前に確かめておく(ヘルパーの起動に少しかかる)
 }
 
-function openUpdateDialog(result) {
+// 更新ヘルパーが使えるか(確かめている途中なら Promise)。使えなかったときは、次に開くときに確かめ直す
+let helperCheck = null;
+
+async function openUpdateDialog(result) {
+  const helper = await (helperCheck ??= helperAvailable());
+  if (!helper) helperCheck = null;
   const link = (text, href) => el('a', { className: 'btn', href, target: '_blank', rel: 'noopener', textContent: text });
   const reload = el('button', { type: 'button', className: 'btn primary', textContent: t('update_reload') });
   reload.addEventListener('click', reloadExtension);
   const dismiss = el('button', { type: 'button', className: 'btn', textContent: t('update_dismiss') });
   const close = el('button', { type: 'button', className: 'btn', textContent: t('common_close') });
-  const form = el('form', { method: 'dialog', className: 'update-dialog' },
-    el('h2', { textContent: t('update_title') }),
-    el('p', { className: 'update-versions', textContent: t('update_versions', { current: result.current, latest: result.latest }) }),
+  // ヘルパーがあれば「今すぐ更新」。手で入れ替える手順は、たたんでおく(失敗したら開く)
+  const status = el('p', { className: 'update-status', role: 'status' });
+  const updateNow = el('button', { type: 'button', className: 'btn primary update-now', textContent: t('update_now') });
+  const manual = el('details', { className: 'update-manual', open: !helper },
+    el('summary', { textContent: t('update_manual') }),
     el('ol', { className: 'update-steps' },
       el('li', {}, el('span', { textContent: t('update_step_files') }),
         el('div', { className: 'update-links' }, link(t('update_download_zip'), ZIP_URL), link(t('update_open_repo'), REPO_URL))),
       el('li', {}, el('span', { textContent: t('update_step_reload') }), el('div', { className: 'update-links' }, reload))),
+    helper ? null : el('p', { className: 'hint update-helper-hint', textContent: t('update_helper_hint') }));
+  const form = el('form', { method: 'dialog', className: 'update-dialog' },
+    el('h2', { textContent: t('update_title') }),
+    el('p', { className: 'update-versions', textContent: t('update_versions', { current: result.current, latest: result.latest }) }),
+    helper ? el('div', { className: 'update-auto' }, updateNow, status) : null,
+    manual,
     el('div', { className: 'actions' }, dismiss, close));
+  updateNow.addEventListener('click', async () => {
+    updateNow.disabled = true;
+    status.textContent = t('update_updating');
+    try {
+      const version = await updateWithHelper();
+      status.textContent = t('update_done', { version });
+      setTimeout(reloadExtension, 800); // 終わったことを見せてから読み込み直す
+    } catch (err) {
+      console.warn('更新ヘルパーで更新できませんでした', err);
+      status.textContent = t('update_auto_failed', { error: err.message });
+      updateNow.disabled = false;
+      manual.open = true;
+    }
+  });
   const dlg = showDialog(form);
   close.addEventListener('click', () => dlg.close());
   dismiss.addEventListener('click', async () => {

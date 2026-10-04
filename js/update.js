@@ -55,5 +55,26 @@ export async function checkForUpdate({ force = false } = {}) {
 
 export const dismissUpdate = (version) => chrome.storage.local.set({ [DISMISS_KEY]: version });
 
+// ---- 更新ヘルパー(native/。Windows 用の Native Messaging のホスト) ----
+// 利用者が native\install.bat で登録しておくと、「今すぐ更新」でファイルの入れ替えまでできる。
+// 登録していなければ(Mac など)手で入れ替える手順を出す
+const HELPER = 'com.hatopoppoppo.widget_newtab';
+
+// ヘルパーが登録されていて応答するか
+export async function helperAvailable() {
+  try {
+    return (await chrome.runtime.sendNativeMessage(HELPER, { command: 'version' }))?.ok === true;
+  } catch {
+    return false;
+  }
+}
+
+// ヘルパーに最新版への入れ替えを頼む。入れ替えたあとの version を返す
+export async function updateWithHelper() {
+  const reply = await chrome.runtime.sendNativeMessage(HELPER, { command: 'update' });
+  if (!reply?.ok) throw new Error(reply?.error ?? 'no reply');
+  return reply.version;
+}
+
 // ファイルを入れ替えたあとに、拡張機能を読み込み直す(開いている新規タブも読み込み直される)
 export const reloadExtension = () => chrome.runtime.reload();
