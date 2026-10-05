@@ -73,7 +73,7 @@ body {
   stroke-linejoin: round;
 }
 
-.page { padding: 12px 16px 48px; }
+.page { padding: 12px 16px; }
 
 .empty {
   margin: 96px 0;
@@ -209,6 +209,7 @@ body {
   border-radius: 14px;
   background: var(--surface);
   color: var(--text);
+  scroll-padding-bottom: 90px; /* 下に固定したボタン(.actions)の裏に、フォーカスした項目が隠れないように */
 }
 .dialog::backdrop { background: rgb(0 0 0 / 40%); }
 .dialog h2 { margin: 0 0 16px; font-size: 18px; }
@@ -277,6 +278,16 @@ body {
   display: flex;
   justify-content: space-between;
   margin-top: 24px;
+}
+/* ダイアログが長くてスクロールしても、保存などのボタンは下に出したままにする */
+.dialog .actions {
+  position: sticky;
+  bottom: -24px; /* ダイアログの padding の分まで下げて、下端に付ける */
+  z-index: 1;
+  margin: 24px -24px -24px;
+  padding: 12px 24px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
 }
 .btn {
   padding: 8px 16px;

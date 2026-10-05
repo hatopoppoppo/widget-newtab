@@ -268,6 +268,10 @@ export function pickWidget(defs, shared = []) {
       el('summary', {}, icon('chevron'), el('span', { textContent: t('picker_shared') })),
       el('p', { className: 'hint', textContent: t('picker_shared_hint') }),
       el('div', { className: 'picker picker-shared' }, shared.map((w) => item(w.label, t('picker_shared_in', { layouts: w.where }), { shared: w })))) : null;
+    // 開いたら、下に固定したボタンの裏に隠れないよう、中身が見えるところまでスクロールする
+    sharedList?.addEventListener('toggle', () => {
+      if (sharedList.open) sharedList.scrollIntoView({ block: 'nearest' });
+    });
     const form = el('form', { method: 'dialog' },
       el('h2', { textContent: t('toolbar_add_widget') }),
       list,
