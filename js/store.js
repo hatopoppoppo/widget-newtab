@@ -62,6 +62,7 @@ export function withPrefDefaults(stored = {}) {
 // PC ごとの設定(同期しない。chrome.storage.local の device:<名前>)
 export const DEVICE_DEFAULTS = {
   reminderNotify: true, // この PC でリマインダーの通知を出す
+  uiScale: 100,         // ウィジェットの文字の大きさ(%)。モニターごとに変えられるよう PC ごと
   switchbotToken: '',   // SwitchBot の API のトークンとシークレット(他の PC に同期させない)
   switchbotSecret: '',
 };

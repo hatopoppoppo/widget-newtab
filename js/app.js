@@ -7,7 +7,7 @@ import { applyTheme } from './theme.js';
 import { applyBackground, backgroundImageField, saveBackgroundPhoto, onBackgroundPhotoChange } from './page-bg.js';
 import { layoutListField } from './layouts-ui.js';
 import * as photos from './photo-store.js';
-import { checkForUpdate, dismissUpdate, reloadExtension, helperAvailable, updateWithHelper, ZIP_URL, REPO_URL } from './update.js';
+import { checkForUpdate, dismissUpdate, reloadExtension, helperAvailable, updateWithHelper, ZIP_URL, REPO_URL, FEEDBACK_URL } from './update.js';
 
 // 全ウィジェット共通の設定項目
 const COMMON_DEFAULTS = { frame: true };
@@ -38,6 +38,7 @@ const PREF_FIELDS = [
   { key: 'widgetBg', label: t('prefs_color'), type: 'color', hint: t('prefs_widget_bg_hint'), when: (v) => v.widgetBgMode === 'custom' },
   { key: 'widgetOpacity', label: t('prefs_widget_opacity'), type: 'range', min: 20, max: 100, step: 5, unit: '%', hint: t('prefs_widget_opacity_hint') },
   { key: 'margin', label: t('prefs_margin'), type: 'range', min: 0, max: 20, unit: 'px' },
+  { key: 'uiScale', device: true, label: t('prefs_ui_scale'), type: 'range', min: 70, max: 150, step: 5, unit: '%', hint: t('prefs_ui_scale_hint') },
 
   section('background', 2),
   {
@@ -91,6 +92,15 @@ let activeLid = null; // 表示しているレイアウト(PC ごと)
 let editing = false;
 let lastLayoutJSON = '';
 
+// ウィジェットの中身の大きさの基準: 幅 1864px の画面(作者の環境の 100%)でのグリッドの幅(左右の余白 16px ずつを除く)。
+// 中身はこのときのマスの大きさで作り、今のグリッドの幅との比(scale)を中身全体に掛ける(.wg-body の CSS の zoom)。
+// 拡大縮小・ウィンドウの幅を変えても、マスと一緒に中身も同じ比率で伸縮するので、見た目が崩れない。
+// zoom の中では offsetHeight などは掛ける前の値、getBoundingClientRect は掛けた後の値になることに注意
+const BASE_GRID_WIDTH = 1832;
+let scale = 1;
+// 全体設定の「文字の大きさ」(PC ごと)。scale に掛ける。マスの大きさは変えないので、大きくすると中身が詰まる
+let uiScale = 1;
+
 applyI18n();
 init();
 
@@ -132,6 +142,7 @@ async function init() {
   } else if (migrateGrid) {
     for (const [lid, d] of Object.entries(data.layoutData)) await store.saveMigratedLayout(lid, d.layout);
   }
+  uiScale = (Number((await store.loadDevicePrefs()).uiScale) || 100) / 100;
   applyPrefs(prefs);
 
   const layout = data.layoutData[activeLid].layout;
@@ -146,7 +157,11 @@ async function init() {
     if (lid === activeLid) applyBackground(prefs, { lid });
   });
 
-  grid.on('change', saveLayout);
+  grid.on('change', onGridChange);
+  // この PC の別のタブで文字の大きさを変えた
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes['device:uiScale']) setUiScale(changes['device:uiScale'].newValue);
+  });
   checkForUpdate().then(showUpdateNotice).catch((err) => console.error(err));
   bindToolbar();
   bindKeyboard();
@@ -159,13 +174,12 @@ async function init() {
     active: (lid) => switchLayout(lid, { remember: false }), // この PC の別のタブで切り替えた
   });
 
-  // マスの大きさがウィンドウ幅で変わるので、px で指定された最小の高さ(requireHeight)を計算し直す
+  // マスの大きさがウィンドウ幅(と拡大縮小)で変わるので、保存した配置に戻してから、
+  // px で指定された最小の高さ(requireHeight)を計算し直す
   let resizeTimer;
   addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      for (const inst of instances.values()) applyMinSize(inst);
-    }, 200);
+    resizeTimer = setTimeout(relayout, 200);
   });
 }
 
@@ -214,6 +228,9 @@ function mountWidget(item, storedConfig) {
   content.append(body, overlay);
 
   const inst = { id: item.id, type: item.type, def, node, content, body, config: fullConfig(def, storedConfig), handle: null, dataWatchers: new Set() };
+  // 保存する配置(自動で決まった位置も含む)。中身の高さで自動で伸びる前の値
+  const { x, y, w, h } = node.gridstackNode;
+  inst.saved = { x, y, w, h };
   instances.set(inst.id, inst);
   settingsBtn.addEventListener('click', () => openWidgetSettings(inst));
   removeBtn.addEventListener('click', () => removeWidget(inst));
@@ -247,7 +264,7 @@ function startWidget(inst) {
     // 今のマス数とウィジェット同士の間隔(px)
     gridSize: () => {
       const { w, h } = inst.node.gridstackNode;
-      return { w, h, margin: grid.getMargin() };
+      return { w, h, margin: grid.getMargin() / scale }; // 中身の座標(scale を掛ける前)での間隔
     },
     // ウィジェットごとのデータ(chrome.storage.sync の data:<id>)。設定とは別に、中身の多いデータを置く。
     // subscribe には他のタブ・バックグラウンドでの変更も、自分の保存も届く(違いは呼び出し側で判断する)
@@ -269,20 +286,64 @@ function startWidget(inst) {
   }
 }
 
-// ウィジェット定義の最小サイズ・setMinSize・requireHeight(px を行数に換算)のうち大きい方を minW / minH にする。
-// 今のサイズが足りなければ gridstack が自動で広げる
+// 画面の大きさによらない最小サイズ(マス数): ウィジェット定義の最小サイズと setMinSize の大きい方
+function fixedMinSize(inst) {
+  return {
+    minW: Math.max(inst.def?.size.minW ?? 1, inst.minGridSize?.w ?? 1),
+    minH: Math.max(inst.def?.size.minH ?? 1, inst.minGridSize?.h ?? 1),
+  };
+}
+
+// fixedMinSize と requireHeight(px を行数に換算)のうち大きい方を minW / minH にする。
+// 今のサイズが足りなければ gridstack が自動で広げる。これは画面の大きさ(マスの大きさ)で変わる表示だけの調整なので、
+// 保存しない(拡大縮小やウィンドウの幅を戻すと、relayout で保存した配置に戻る)
 function applyMinSize(inst) {
-  let minW = Math.max(inst.def?.size.minW ?? 1, inst.minGridSize?.w ?? 1);
-  let minH = Math.max(inst.def?.size.minH ?? 1, inst.minGridSize?.h ?? 1);
+  let { minW, minH } = fixedMinSize(inst);
   if (inst.minBodyHeight > 0) {
-    const frame = inst.content.offsetHeight - inst.body.clientHeight; // カードの枠線など
-    const px = inst.minBodyHeight + frame + 2 * grid.getMargin();
+    // requireHeight の px は中身の座標(scale を掛ける前)なので、グリッドの座標に直す
+    const frame = inst.content.offsetHeight - inst.body.offsetHeight * scale; // カードの枠線など
+    const px = inst.minBodyHeight * scale + frame + 2 * grid.getMargin();
     minH = Math.max(minH, Math.ceil(px / grid.getCellHeight(true)));
   }
   const node = inst.node.gridstackNode;
   if (node.minW === minW && node.minH === minH) return;
-  grid.update(inst.node, { minW, minH });
-  saveLayout();
+  adjust(() => grid.update(inst.node, { minW, minH }));
+  // 最小の高さが下がって、自動で伸びた分が要らなくなったら、保存した配置に戻す(押し下げたほかのウィジェットも戻すため、全体で)
+  if (node.w > Math.max(inst.saved.w, minW) || node.h > Math.max(inst.saved.h, minH)) scheduleRelayout();
+}
+
+let relayoutTimer;
+function scheduleRelayout() {
+  clearTimeout(relayoutTimer);
+  relayoutTimer = setTimeout(relayout, 50);
+}
+
+// 表示だけの調整(保存しない)。この間の gridstack の change は、自分で動かした変更として扱わない
+let adjusting = 0;
+function adjust(fn) {
+  adjusting++;
+  try {
+    fn();
+  } finally {
+    adjusting--;
+  }
+}
+
+// 保存した配置に戻してから、今のマスの大きさで最小サイズを当て直す
+function relayout() {
+  adjust(() => {
+    updateScale();
+    grid.batchUpdate();
+    try {
+      const list = [...instances.values()];
+      // 先に大きさを戻してから、上から順に位置を戻す(伸びたウィジェットに押し下げられた位置から、ぶつからずに戻すため)
+      for (const inst of list) grid.update(inst.node, { w: inst.saved.w, h: inst.saved.h, ...fixedMinSize(inst) });
+      for (const inst of list.sort((a, b) => a.saved.y - b.saved.y)) grid.update(inst.node, { x: inst.saved.x, y: inst.saved.y });
+      for (const inst of list) applyMinSize(inst);
+    } finally {
+      grid.batchUpdate(false);
+    }
+  });
 }
 
 function stopWidget(inst) {
@@ -384,14 +445,18 @@ async function openPrefs() {
     const next = { ...prefs, ...v, widgetOpacity: Number(v.widgetOpacity) };
     applyTheme(next);
     applyBackground(next, { lid: activeLid, pending: v.bgImage });
+    setUiScale(v.uiScale);
   };
   const values = await editSettings({ title: t('toolbar_prefs'), fields: PREF_FIELDS, values: { ...prefs, ...device }, onInput: preview });
   delete values?.about;
   if (!values) {
     applyTheme(prefs);
     applyBackground(prefs, { lid: activeLid });
+    setUiScale(device.uiScale);
     return;
   }
+  values.uiScale = Number(values.uiScale);
+  setUiScale(values.uiScale);
   // 選んだ背景の画像は IndexedDB に置く(全体設定には入れない)
   const { bgImage } = values;
   delete values.bgImage;
@@ -414,8 +479,27 @@ async function openPrefs() {
 function applyPrefs(p) {
   applyTheme(p);
   applyBackground(p, { lid: activeLid });
-  if (grid.getMargin() !== p.margin) grid.margin(p.margin);
+  updateScale(p);
   for (const inst of instances.values()) applyMinSize(inst); // 間隔が変わると必要な行数も変わる
+}
+
+// 今のグリッドの幅から scale を決め、中身に掛ける(文字の大きさの設定も掛ける)。ウィジェット同士の間隔はグリッドの幅の比だけ
+function updateScale(p = prefs) {
+  const width = grid.el.clientWidth;
+  if (!width) return;
+  const gridScale = width / BASE_GRID_WIDTH;
+  scale = gridScale * uiScale;
+  grid.el.style.setProperty('--wg-scale', scale);
+  const margin = Math.round(p.margin * gridScale * 100) / 100;
+  if (grid.getMargin() !== margin) grid.margin(margin);
+}
+
+// 文字の大きさを変える(全体設定・他のタブ)。必要な高さが変わるので、保存した配置から当て直す
+function setUiScale(percent) {
+  const next = (Number(percent) || 100) / 100;
+  if (next === uiScale) return;
+  uiScale = next;
+  relayout();
 }
 
 function setEditing(on) {
@@ -435,11 +519,25 @@ function updateEmpty() {
 
 function serializeLayout() {
   return [...instances.values()]
-    .map(({ id, type, node }) => {
-      const { x, y, w, h } = node.gridstackNode;
-      return { id, type, x, y, w, h };
-    })
+    .map(({ id, type, saved: { x, y, w, h } }) => ({ id, type, x, y, w, h }))
     .sort((a, b) => a.y - b.y || a.x - b.x);
+}
+
+// 自分で動かした(ドラッグ・リサイズ・追加)ときに、今の配置を保存する配置にする。
+// ただし中身の高さ(requireHeight)で自動で伸びて、その最小の高さに張り付いているウィジェットは、伸びる前の高さのままにする
+function captureSaved() {
+  for (const inst of instances.values()) {
+    const node = inst.node.gridstackNode;
+    const { minH } = fixedMinSize(inst);
+    const stretched = node.minH > minH && node.h === node.minH && inst.saved.h < node.h;
+    inst.saved = { x: node.x, y: node.y, w: node.w, h: stretched ? Math.max(inst.saved.h, minH) : node.h };
+  }
+}
+
+function onGridChange() {
+  if (mounting || adjusting) return;
+  captureSaved();
+  saveLayout();
 }
 
 // ウィジェットをまとめて配置している間は保存しない。途中で(最小サイズの補正などから)保存すると、
@@ -454,7 +552,7 @@ function mountAll(fn) {
     grid.batchUpdate(false);
     mounting = false;
   }
-  saveLayout(); // 最小サイズなどで補正された場合は、補正後の値を保存する
+  saveLayout(); // 定義の最小サイズなどで補正された場合は、補正後の値を保存する
 }
 
 function saveLayout() {
@@ -506,6 +604,11 @@ async function onRemoteLayout(layout, configs = null) {
     // 押し出され、保存された配置とずれる(ずれた配置を保存すると、他のタブとの間で書き換え合いが続く)
     for (const item of layout) instances.get(item.id) && grid.update(instances.get(item.id).node, { x: item.x, y: item.y, w: item.w, h: item.h });
     for (const item of layout) if (!instances.has(item.id)) mountWidget(item, configs[item.id]);
+    for (const item of layout) {
+      const inst = instances.get(item.id);
+      const { minW, minH } = fixedMinSize(inst);
+      inst.saved = { x: item.x, y: item.y, w: Math.max(item.w, minW), h: Math.max(item.h, minH) };
+    }
   });
   updateEmpty();
 }
@@ -649,7 +752,7 @@ async function openUpdateDialog(result) {
   reload.addEventListener('click', reloadExtension);
   const dismiss = el('button', { type: 'button', className: 'btn', textContent: t('update_dismiss') });
   const close = el('button', { type: 'button', className: 'btn', textContent: t('common_close') });
-  // ヘルパーがあれば「今すぐ更新」。手で入れ替える手順は、たたんでおく(失敗したら開く)
+  // ヘルパーがあれば「今すぐ更新」。手動で入れ替える手順は、たたんでおく(失敗したら開く)
   const status = el('p', { className: 'update-status', role: 'status' });
   const updateNow = el('button', { type: 'button', className: 'btn primary update-now', textContent: t('update_now') });
   const manual = el('details', { className: 'update-manual', open: !helper },
@@ -704,7 +807,8 @@ function aboutField() {
   reload.addEventListener('click', reloadExtension);
   const node = el('div', { className: 'about' },
     el('span', { className: 'about-version', textContent: t('update_current', { version: chrome.runtime.getManifest().version }) }),
-    check, reload, status);
+    check, reload, status,
+    el('a', { className: 'about-feedback', href: FEEDBACK_URL, target: '_blank', rel: 'noopener', textContent: t('feedback_report') }));
   return { node, read: () => null };
 }
 

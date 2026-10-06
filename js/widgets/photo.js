@@ -90,7 +90,7 @@ export default {
     const status = el('p', { className: 'ph-status', hidden: true });
     const empty = el('div', { className: 'ph-empty', hidden: true },
       el('p', { className: 'wg-message', textContent: t('photo_empty') }),
-      el('button', { type: 'button', className: 'btn ph-empty-add' }, icon('plus'), t('photo_add')),
+      el('button', { type: 'button', className: 'btn ph-empty-add', title: t('photo_add') }, icon('plus'), el('span', { textContent: t('photo_add') })),
       el('p', { className: 'ph-hint', textContent: t('photo_empty_hint') }));
     root.append(stage, prevBtn, nextBtn, tools, empty, status);
 

@@ -10,6 +10,7 @@ import { t } from './i18n.js';
 
 export const REPO_URL = 'https://github.com/hatopoppoppo/widget-newtab';
 export const ZIP_URL = `${REPO_URL}/archive/refs/heads/main.zip`;
+export const FEEDBACK_URL = 'https://forms.gle/cfhFQ6WW6g3RCLGK9'; // 不具合の報告(Google フォーム)
 const MANIFEST_URL = () => globalThis.UPDATE_MANIFEST_URL ?? 'https://raw.githubusercontent.com/hatopoppoppo/widget-newtab/main/manifest.json';
 const CACHE_KEY = 'update:check';       // { at, latest }(latest は確認できなければ null)
 const DISMISS_KEY = 'update:dismissed'; // 「このバージョンは知らせない」を選んだ version
@@ -57,7 +58,7 @@ export const dismissUpdate = (version) => chrome.storage.local.set({ [DISMISS_KE
 
 // ---- 更新ヘルパー(native/。Windows 用の Native Messaging のホスト) ----
 // 利用者が native\install.bat で登録しておくと、「今すぐ更新」でファイルの入れ替えまでできる。
-// 登録していなければ(Mac など)手で入れ替える手順を出す
+// 登録していなければ(Mac など)手動で入れ替える手順を出す
 const HELPER = 'com.hatopoppoppo.widget_newtab';
 
 // ヘルパーが登録されていて応答するか

@@ -230,6 +230,12 @@
   "prefs_bg_image_blur": {
     "message": "ぼかす"
   },
+  "prefs_ui_scale": {
+    "message": "文字の大きさ"
+  },
+  "prefs_ui_scale_hint": {
+    "message": "ウィジェットの中身の大きさです。ウィジェットの大きさと配置は変わりません。このPCだけに保存します(モニターごとに変えられます)。"
+  },
   "prefs_margin": {
     "message": "ウィジェットの間隔"
   },
@@ -670,9 +676,6 @@
   },
   "links_icon_hint": {
     "message": "SVGやPNGの画像のURLを指定すると、自動で取得したアイコンの代わりに使います。"
-  },
-  "links_icon_hint_no_permission": {
-    "message": "高解像度アイコンの取得が許可されていないため、小さいアイコンで表示しています。chrome://extensionsの詳細の「サイトへのアクセス」から許可できます。"
   },
   "links_bad_url": {
     "message": "URLの形式が正しくありません"
@@ -1529,6 +1532,9 @@
   "update_reload": {
     "message": "再読み込み"
   },
+  "feedback_report": {
+    "message": "不具合を報告する"
+  },
   "update_reload_hint": {
     "message": "ファイルを入れ替えたあとに押すと、拡張機能を読み込み直します。"
   },
@@ -1545,7 +1551,7 @@
     "message": "更新できませんでした({error})。下の手順で更新してください。"
   },
   "update_manual": {
-    "message": "手で更新する"
+    "message": "手動で更新する"
   },
   "update_helper_hint": {
     "message": "拡張機能のフォルダの「native」にあるinstall.batを一度実行しておくと、ここから「今すぐ更新」でファイルの入れ替えまでできます(Windowsだけ)。"

@@ -150,6 +150,7 @@ body {
   height: 100%;
   overflow: auto;
   container-type: size;  /* 中身を cqw / cqh でウィジェットサイズに合わせて伸縮させる */
+  zoom: var(--wg-scale, 1); /* マスの大きさに合わせて中身全体を伸縮させる(js/app.js の updateScale) */
 }
 
 .wg-message {
@@ -1253,6 +1254,10 @@ body {
 .tm-step:hover { background: var(--surface-hover); color: var(--text); opacity: 1; }
 
 .tm-presets { flex: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+/* 低いとき(最小の大きさで文字を大きくしたときなど)は、プリセットを省いて円に場所を譲る */
+@container (height < 240px) { .tm-presets { display: none; } }
+/* それでも円が小さすぎるときは、円を消して時刻だけにする(.tm-dial が container) */
+@container (height < 90px) { .tm-ring { display: none; } }
 .tm-preset {
   padding: 2px 8px;
   border: 1px solid var(--border);
@@ -1370,7 +1375,11 @@ body {
 }
 .ph-empty[hidden] { display: none; }
 .ph-empty .wg-message { padding: 0; }
-.ph-empty-add { display: inline-flex; align-items: center; gap: 6px; }
+.ph-empty-add { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+/* 小さいときは、説明を省いて「写真を追加」だけにする */
+@container (height < 220px) { .ph-hint { display: none; } }
+@container (height < 150px) or (width < 180px) { .ph-empty .wg-message, .ph-hint { display: none; } }
+@container (width < 130px) { .ph-empty-add > span:not(.icon) { display: none; } }
 .ph-empty-add .icon svg { width: 16px; height: 16px; }
 .ph-hint { margin: 0; max-width: 32em; color: var(--text-muted); font-size: 12px; }
 .ph-status {
@@ -1582,3 +1591,4 @@ body {
 .about-version { margin-right: 4px; font-variant-numeric: tabular-nums; }
 .about .btn { padding: 6px 12px; }
 .about-status { font-size: 12px; color: var(--text-muted); }
+.about-feedback { flex-basis: 100%; font-size: 13px; color: var(--text); }

@@ -3,12 +3,12 @@
 // Chrome の _favicon API はタブ用の小さな画像(16〜32px)しか持っていないので、大きく表示するとぼやける。
 // そこでリンクのページの HTML を一度だけ取得し、SVG や大きい PNG(apple-touch-icon、sizes 付きの icon、
 // manifest のアイコン)を探して chrome.storage.local に data URL で保存する。
-// 他サイトの HTML を読むには host 権限が必要なので、manifest の optional_host_permissions を
-// ユーザー操作の中で requestPermission() から要求する。
+// 他サイトの HTML を読むには host 権限が必要。manifest の optional_host_permissions は <all_urls> にしてあるが、
+// 実際に求めるのはリンク集にあるサイトの分だけ(requestPermission(links)。確認画面にサイト名が出る)。
+// 以前の版で <all_urls> を許可した人は、そのまま全部のサイトで取得できる
 
 import { faviconUrl } from './ui.js';
 
-const ORIGINS = ['<all_urls>'];
 const KEY_PREFIX = 'icon:';
 const MIN_SIZE = 64;             // これより小さいアイコンしか無ければ _favicon のままにする
 const RASTER_SIZE = 128;         // PNG などはこの大きさに縮小して保存する
@@ -19,19 +19,53 @@ const PARALLEL = 3;
 
 // ---------- 権限 ----------
 
-let permitted = false;
-const permissionReady = chrome.permissions.contains({ origins: ORIGINS }).then((ok) => { permitted = ok; });
-chrome.permissions.onAdded.addListener(() => chrome.permissions.contains({ origins: ORIGINS }).then((ok) => { permitted = ok; }));
-chrome.permissions.onRemoved.addListener(() => { permitted = false; });
+// 「example.co.jp」のような 3 段のドメインになる、国別ドメインの 2 段目
+const SECOND_LEVEL = new Set(['co', 'ac', 'ne', 'or', 'go', 'ed', 'gr', 'lg', 'com', 'net', 'org', 'gov', 'edu']);
 
-export const hasPermission = () => permitted;
+// URL のサイトの権限のパターン。サブドメインも含める(www へのリダイレクトや、static.〜 の画像も取れるように)。
+// https://www.example.co.jp/a → *://*.example.co.jp/*。IP アドレスや localhost はそのホストだけ。http(s) 以外は null
+export function sitePattern(url) {
+  let u;
+  try {
+    u = new URL(url);
+  } catch {
+    return null;
+  }
+  if (!/^https?:$/.test(u.protocol)) return null;
+  const host = u.hostname;
+  if (/^[\d.]+$/.test(host) || host.startsWith('[') || !host.includes('.')) return `*://${host}/*`;
+  const labels = host.split('.');
+  const n = labels.length >= 3 && labels.at(-1).length === 2 && SECOND_LEVEL.has(labels.at(-2)) ? 3 : 2;
+  return `*://*.${labels.slice(-n).join('.')}/*`;
+}
 
-// クリックなどのユーザー操作のハンドラから「同期的に」呼ぶこと(await の後だと確認ダイアログが出ない)
-export function requestPermission() {
-  return chrome.permissions.request({ origins: ORIGINS }).then((ok) => {
-    permitted = ok;
+// リンクのアイコンを取るのに要る権限(リンク先と、手動で指定したアイコンのサイト)
+const patternsFor = (link) => [link.url, link.icon].map((u) => u && sitePattern(u)).filter(Boolean);
+
+let granted = new Set(); // 許可されている host 権限のパターン
+let grantedAll = false;  // <all_urls> を許可されている(以前の版で許可した人)
+const loadGranted = () => chrome.permissions.getAll().then(({ origins = [] }) => {
+  granted = new Set(origins);
+  grantedAll = origins.some((o) => o === '<all_urls>' || o === '*://*/*');
+});
+const permissionReady = loadGranted();
+chrome.permissions.onAdded.addListener(loadGranted);
+chrome.permissions.onRemoved.addListener(loadGranted);
+
+export const hasPermission = (link) => grantedAll || patternsFor(link).every((p) => granted.has(p));
+
+// まだ許可されていないサイトの分だけ、まとめて確認する。許可されたら(もともと全部あれば)true。
+// クリックなどのユーザー操作から間を置かずに呼ぶこと(ユーザー操作の外だと確認画面を出せない)
+export function requestPermission(links) {
+  const missing = grantedAll ? [] : [...new Set(links.flatMap(patternsFor))].filter((p) => !granted.has(p));
+  if (!missing.length) return Promise.resolve(true);
+  return chrome.permissions.request({ origins: missing }).then(async (ok) => {
+    await loadGranted();
     return ok;
-  }).catch(() => false);
+  }).catch((err) => {
+    console.warn('アイコンを取得する権限を求められませんでした', err);
+    return false;
+  });
 }
 
 // ---------- キャッシュ ----------
@@ -190,13 +224,14 @@ async function resolveIcon(link) {
       // 次の候補へ
     }
   }
-  return null; // 大きいアイコンが無い → _favicon のまま
+  // 画像が権限の無い別のサイト(CDN など)にあって読めなければ、URL のまま <img> で表示する(表示だけなら権限は要らない)
+  return candidates[0]?.url ?? null; // 大きいアイコンが無い → _favicon のまま
 }
 
 // 必要ならアイコンを取得してキャッシュする。表示を変えるべきとき true を返す
 export async function ensureIcon(link) {
   await ready();
-  if (!permitted) return false;
+  if (!hasPermission(link)) return false;
   if (!link.icon && !isWeb(link.url)) return false;
   if (link.icon && !isWeb(link.icon)) return false;
   const key = cacheKey(link);

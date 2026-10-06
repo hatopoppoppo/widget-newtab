@@ -47,12 +47,7 @@ async function editLink(link) {
     fields: [
       { key: 'url', label: 'URL', type: 'text', placeholder: 'https://example.com' },
       { key: 'title', label: t('links_title'), type: 'text', placeholder: t('links_title_placeholder') },
-      {
-        key: 'icon', label: t('links_icon'), type: 'text', placeholder: t('links_icon_placeholder'),
-        hint: icons.hasPermission()
-          ? t('links_icon_hint')
-          : t('links_icon_hint_no_permission'),
-      },
+      { key: 'icon', label: t('links_icon'), type: 'text', placeholder: t('links_icon_placeholder'), hint: t('links_icon_hint') },
     ],
     values: { url: link?.url ?? '', title: link?.title ?? '', icon: link?.icon ?? '' },
   });
@@ -158,6 +153,12 @@ export default {
       return img;
     };
 
+    // 足したり直したりしたリンクと、まだ許可されていないほかのリンクのサイトの権限を、まとめて確認する。
+    // 保存のクリックの直後に呼ぶ(ユーザー操作から間を置くと確認画面を出せない)
+    const askIconPermission = (links) => {
+      icons.requestPermission(links).then((ok) => ok && refreshIcons());
+    };
+
     // 未取得のアイコンを取りに行き、取れたものがあれば描き直す
     const refreshIcons = async () => {
       const results = await Promise.all(config.links.map((l) => icons.ensureIcon(l)));
@@ -178,7 +179,10 @@ export default {
       const delBtn = el('button', { type: 'button', className: 'ln-btn', title: t('common_delete') }, icon('close'));
       editBtn.addEventListener('click', async () => {
         const updated = await editLink(link);
-        if (updated) save(config.links.map((l) => (l.id === link.id ? { ...l, ...updated } : l)));
+        if (!updated) return;
+        const links = config.links.map((l) => (l.id === link.id ? { ...l, ...updated } : l));
+        askIconPermission(links);
+        save(links);
       });
       delBtn.addEventListener('click', () => {
         if (confirm(t('widget_confirm_delete', { name: title }))) save(config.links.filter((l) => l.id !== link.id));
@@ -202,10 +206,10 @@ export default {
           el('span', { className: 'ln-icon' }, icon('plus')),
           el('span', { className: 'ln-title', textContent: t('links_add_short') }));
         add.addEventListener('click', async () => {
-          // 確認ダイアログはクリックの中で同期的に出す必要があるので、await より前に要求する
-          if (!icons.hasPermission()) icons.requestPermission().then((ok) => ok && refreshIcons());
           const link = await editLink(null);
-          if (link) addLink(link);
+          if (!link) return;
+          askIconPermission([...config.links, link]);
+          addLink(link);
         });
         items.push(add);
       }
@@ -327,7 +331,9 @@ export default {
       wrap.classList.remove('drop-target');
       if (dragging) return; // 並べ替えは dragend で確定
       const link = droppedLink(e.dataTransfer);
-      if (link) addLink(link);
+      if (!link) return;
+      askIconPermission([...config.links, link]);
+      addLink(link);
     });
 
     list.addEventListener('dragend', () => {

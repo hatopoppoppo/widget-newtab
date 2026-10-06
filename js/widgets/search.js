@@ -111,13 +111,18 @@ export default {
       }
     };
 
-    // ボタンの真下(下に入らなければ真上)に出す
+    // ボタンの真下(下に入らなければ真上)に出す。ウィジェットの中身は CSS の zoom で伸縮しているので、
+    // 見た目の座標(getBoundingClientRect)で計算してから、メニューの zoom で割って指定する
     const placeMenu = () => {
+      const zoom = menu.currentCSSZoom || 1;
       const r = button.getBoundingClientRect();
-      const h = menu.offsetHeight;
+      const h = menu.offsetHeight * zoom;
+      const w = menu.offsetWidth * zoom;
       const below = r.bottom + 6;
-      menu.style.left = `${Math.max(8, Math.min(r.left, innerWidth - menu.offsetWidth - 8))}px`;
-      menu.style.top = `${below + h > innerHeight - 8 && r.top - 6 - h > 8 ? r.top - 6 - h : below}px`;
+      const left = Math.max(8, Math.min(r.left, innerWidth - w - 8));
+      const top = below + h > innerHeight - 8 && r.top - 6 - h > 8 ? r.top - 6 - h : below;
+      menu.style.left = `${left / zoom}px`;
+      menu.style.top = `${top / zoom}px`;
     };
     menu.addEventListener('toggle', (e) => {
       const open = e.newState === 'open';
