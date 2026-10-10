@@ -13,6 +13,13 @@ function timeZoneOptions() {
 // "America/New_York" -> "New York"
 const cityName = (tz) => tz.split('/').pop().replaceAll('_', ' ');
 
+// 時刻の文字の幅の見積もり(em)。午前・午後(dayPeriod)は小さく(.clock-period)表示する
+const PERIOD_SCALE = 0.45;
+const charWidth = (c) => (c.charCodeAt(0) >= 0x3000 ? 1 : c === ':' ? 0.32 : c === ' ' ? 0.25 : 0.6);
+const textWidth = (parts) => parts.reduce((sum, p) => sum + [...p.value].reduce((w, c) => w + charWidth(c), 0) * (p.type === 'dayPeriod' ? PERIOD_SCALE : 1), 0);
+// 「00:00」の幅を 1 として、それより長い表示(秒・午前午後)は数字を縮めて枠に収める(--fit)
+const BASE_WIDTH = textWidth([{ type: 'hour', value: '00:00' }]);
+
 export default {
   type: 'clock',
   name: t('clock_name'),
@@ -45,7 +52,7 @@ export default {
 
     const tick = () => {
       const now = new Date();
-      time.textContent = timeFmt.format(now);
+      time.replaceChildren(...timeFmt.formatToParts(now).map((p) => (p.type === 'dayPeriod' ? el('span', { className: 'clock-period', textContent: p.value }) : p.value)));
       if (config.showDate) date.textContent = dateFmt.format(now);
       if (offsetFmt) {
         const offset = offsetFmt.formatToParts(now).find((p) => p.type === 'timeZoneName')?.value;
@@ -60,6 +67,7 @@ export default {
         timeZone, hour: '2-digit', minute: '2-digit', hour12: cfg.hour12,
         ...(cfg.showSeconds && { second: '2-digit' }),
       });
+      time.style.setProperty('--fit', Math.min(1, BASE_WIDTH / textWidth(timeFmt.formatToParts(new Date(2000, 0, 1, 23, 59, 59)))));
       dateFmt = new Intl.DateTimeFormat(t('locale'), { timeZone, year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
       offsetFmt = cfg.timeZone && cfg.showOffset ? new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'shortOffset' }) : null;
 

@@ -1,6 +1,11 @@
 // chrome.storage.sync のキー構成
-//   layouts       : [{ id, name }]                レイアウト(配置と見た目の設定の組)の一覧。並び順もこのまま
-//   layout:<lid>  : [{ id, type, x, y, w, h }]   レイアウトごとのウィジェットの配置
+//   layouts       : [{ id, name, variants? }]    プロファイル(配置と見た目の設定の組)の一覧。並び順もこのまま。
+//                   コードでは歴史的な事情で「レイアウト」(lid)と呼んでいる。
+//                   variants: [{ id, name, columns, maxWidth? }] プロファイルの中のレイアウト(ウィンドウの幅に合わせた並べ方)。
+//                   先頭は条件なし(id 'default')。maxWidth はウィンドウの幅がこれ以下ならそのレイアウトにする。無ければ 24 列の 1 つだけ
+//   layout:<lid>  : [{ id, type, x, y, w, h }]   ウィジェットの配置(先頭のレイアウト)
+//   layout:<lid>/<vid> : 同じ形                  先頭以外のレイアウトの配置。ウィジェットの組はどのレイアウトでも同じ。
+//                                                無ければ先頭のレイアウトの配置を詰めて使い、そのレイアウトで動かしたときに保存する
 //   prefs:<lid>   : { ... }                      レイアウトごとの全体設定(テーマ・色・背景・間隔)
 //   cfg:<id>      : { ... }                      ウィジェットごとの設定(レイアウトをまたいで共有)
 //   data:<id>     : any                          ウィジェットごとのデータ(ToDo・リマインダーの中身など。共有)
@@ -23,6 +28,11 @@ const LEGACY_PREFS = 'prefs';
 const ACTIVE = 'activeLayout';
 export const MAIN_LAYOUT = 'main'; // 以前の 1 組だけの設定から移したレイアウトの id
 export const MAX_LAYOUTS = 10;     // sync の容量(全体で 100KB)の都合
+export const MAX_VARIANTS = 3;     // 1 つのプロファイルの中のレイアウトの数(同じく容量の都合)
+export const DEFAULT_VARIANT = 'default';
+// プロファイルの中のレイアウト。先頭は条件なし
+export const variantsOf = (profile) => (profile?.variants?.length ? profile.variants : [{ id: DEFAULT_VARIANT, name: null, columns: 24 }]);
+const arrangementKey = (lid, vid = DEFAULT_VARIANT) => LAYOUT_PREFIX + lid + (vid === DEFAULT_VARIANT ? '' : `/${vid}`);
 const CFG_PREFIX = 'cfg:';
 const DATA_PREFIX = 'data:';
 const GRID_VERSION = 'gridVersion';
@@ -77,7 +87,8 @@ export const saveDevicePrefs = (prefs) =>
 // gridVersion 1 のころの「1 行の高さ」の初期値(prefs.cellHeight が無いときの移行用)
 export const LEGACY_CELL_HEIGHT = 64;
 
-// sync の中身を読む。layoutData: { [lid]: { layout, prefs } }。
+// sync の中身を読む。layoutData: { [lid]: { layout, variants, prefs } }。
+// layout は先頭のレイアウトの配置、variants は先頭以外で保存されている配置 { [vid]: layout }。
 // widgets はどれかのレイアウトに置かれているウィジェット [{ id, type }](重なりなし。バックグラウンドの通知などで使う)
 function parseAll(all) {
   const configs = {};
@@ -92,11 +103,16 @@ function parseAll(all) {
   if (legacy) {
     if (all[LEGACY_LAYOUT] || all[LEGACY_PREFS]) {
       layouts = [{ id: MAIN_LAYOUT, name: null }]; // 名前は移すときに付ける
-      layoutData[MAIN_LAYOUT] = { layout: all[LEGACY_LAYOUT] ?? [], prefs: withPrefDefaults(all[LEGACY_PREFS]) };
+      layoutData[MAIN_LAYOUT] = { layout: all[LEGACY_LAYOUT] ?? [], variants: {}, prefs: withPrefDefaults(all[LEGACY_PREFS]) };
     }
   } else {
     layouts = all[LAYOUTS];
-    for (const { id } of layouts) layoutData[id] = { layout: all[LAYOUT_PREFIX + id] ?? [], prefs: withPrefDefaults(all[PREFS_PREFIX + id]) };
+    for (const profile of layouts) {
+      const { id } = profile;
+      const variants = {};
+      for (const v of variantsOf(profile).slice(1)) if (all[arrangementKey(id, v.id)]) variants[v.id] = all[arrangementKey(id, v.id)];
+      layoutData[id] = { layout: all[LAYOUT_PREFIX + id] ?? [], variants, prefs: withPrefDefaults(all[PREFS_PREFIX + id]) };
+    }
   }
   const widgets = new Map();
   for (const { layout } of Object.values(layoutData)) for (const w of layout) widgets.set(w.id, { id: w.id, type: w.type });
@@ -129,9 +145,17 @@ export async function migrateLegacy({ name, layout, prefs }) {
 export const saveLayoutList = (layouts) => chrome.storage.sync.set({ [LAYOUTS]: layouts });
 export const saveLayout = (lid, layout) => chrome.storage.sync.set({ [LAYOUT_PREFIX + lid]: layout });
 export const savePrefs = (lid, prefs) => chrome.storage.sync.set({ [PREFS_PREFIX + lid]: prefs });
-export const saveLayoutData = (lid, { layout, prefs }) =>
-  chrome.storage.sync.set({ [LAYOUT_PREFIX + lid]: layout, [PREFS_PREFIX + lid]: prefs });
-export const removeLayoutData = (lid) => chrome.storage.sync.remove([LAYOUT_PREFIX + lid, PREFS_PREFIX + lid]);
+// プロファイルの中のレイアウト vid の配置
+export const saveArrangement = (lid, vid, layout) => chrome.storage.sync.set({ [arrangementKey(lid, vid)]: layout });
+export const removeArrangement = (lid, vid) => chrome.storage.sync.remove(arrangementKey(lid, vid));
+const variantItems = (lid, variants = {}) => Object.fromEntries(Object.entries(variants).map(([vid, layout]) => [arrangementKey(lid, vid), layout]));
+export const saveLayoutData = (lid, { layout, variants = {}, prefs }) =>
+  chrome.storage.sync.set({ [LAYOUT_PREFIX + lid]: layout, [PREFS_PREFIX + lid]: prefs, ...variantItems(lid, variants) });
+// プロファイルの配置(どのレイアウトも)と全体設定を消す
+export async function removeLayoutData(lid) {
+  const keys = Object.keys(await chrome.storage.sync.get(null)).filter((k) => k === LAYOUT_PREFIX + lid || k.startsWith(`${LAYOUT_PREFIX}${lid}/`));
+  await chrome.storage.sync.remove([...keys, PREFS_PREFIX + lid]);
+}
 export const saveMigratedLayout = (lid, layout) =>
   chrome.storage.sync.set({ [LAYOUT_PREFIX + lid]: layout, [GRID_VERSION]: CURRENT_GRID_VERSION });
 
@@ -178,6 +202,7 @@ export async function replaceAll({ layouts, layoutData, layout, prefs = {}, name
   const items = { [LAYOUTS]: layouts, [GRID_VERSION]: gridVersion };
   for (const { id } of layouts) {
     items[LAYOUT_PREFIX + id] = layoutData[id]?.layout ?? [];
+    Object.assign(items, variantItems(id, layoutData[id]?.variants));
     items[PREFS_PREFIX + id] = withPrefDefaults(layoutData[id]?.prefs);
   }
   for (const [id, cfg] of Object.entries(configs)) items[CFG_PREFIX + id] = cfg;
@@ -213,7 +238,8 @@ export function onMemoChange(fn) {
 }
 
 // 他のタブ・PC で変更されたときの通知。自分の書き込みも届くので、呼び出し側で差分を見て判断する。
-//   layouts(list) / layout(lid, layout) / prefs(lid, prefs) / config(id, cfg) / data(id, value)
+//   layouts(list) / layout(lid, layout, vid) / prefs(lid, prefs) / config(id, cfg) / data(id, value)
+//   layout の vid はプロファイルの中のレイアウト。先頭以外の配置が消えたときは layout が null
 //   active(lid): この PC の別のタブでレイアウトを切り替えた
 export function onExternalChange({ layouts, layout, prefs, config, data, active }) {
   chrome.storage.onChanged.addListener((changes, area) => {
@@ -224,7 +250,10 @@ export function onExternalChange({ layouts, layout, prefs, config, data, active 
       }
       if (area !== 'sync') continue;
       if (key === LAYOUTS) layouts?.(newValue ?? []);
-      else if (key.startsWith(LAYOUT_PREFIX)) layout?.(key.slice(LAYOUT_PREFIX.length), newValue ?? []);
+      else if (key.startsWith(LAYOUT_PREFIX)) {
+        const [lid, vid = DEFAULT_VARIANT] = key.slice(LAYOUT_PREFIX.length).split('/');
+        layout?.(lid, newValue ?? (vid === DEFAULT_VARIANT ? [] : null), vid);
+      }
       else if (key.startsWith(PREFS_PREFIX)) prefs?.(key.slice(PREFS_PREFIX.length), withPrefDefaults(newValue));
       else if (key.startsWith(CFG_PREFIX)) config?.(key.slice(CFG_PREFIX.length), newValue);
       else if (key.startsWith(DATA_PREFIX)) data?.(key.slice(DATA_PREFIX.length), newValue);

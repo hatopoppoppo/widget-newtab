@@ -352,11 +352,12 @@ body {
   opacity: .8;
 }
 .clock-time {
-  font-size: max(16px, min(40cqh, 20cqw));
+  font-size: max(16px, min(40cqh, 20cqw * var(--fit, 1)));
   font-weight: 300;
   font-variant-numeric: tabular-nums;
   letter-spacing: .02em;
 }
+.clock-period { margin: 0 .15em; font-size: .45em; font-weight: 400; } /* 午前・午後 */
 .clock-date {
   margin-top: .3em;
   font-size: max(11px, min(12cqh, 7cqw));
@@ -1559,8 +1560,38 @@ body {
 
 .lo-editor { display: grid; gap: 10px; }
 .lo-list { display: grid; gap: 6px; }
-.lo-row { display: flex; align-items: center; gap: 6px; }
+.lo-row { display: grid; gap: 6px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.lo-main { display: flex; align-items: center; gap: 6px; }
 .field .lo-row .lo-name { flex: 1; min-width: 0; }
+/* プロファイルの中のレイアウト */
+.lo-variants { display: grid; gap: 4px; margin-left: 16px; }
+.lo-variant { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; }
+.field .lo-variant .lo-vname { flex: 1 1 8em; min-width: 6em; width: auto; padding: 4px 8px; font-size: 13px; }
+.field .lo-variant select { width: auto; padding: 3px 6px; font-size: 12px; }
+.lo-rule { display: inline-flex; flex: 0 0 15em; align-items: center; gap: 6px; color: var(--text-muted); }
+.field .lo-rule .lo-width { width: 7em; padding: 3px 6px; font-size: 12px; }
+.lo-row .lo-vdelete { padding: 4px 8px; }
+.lo-vdelete.lo-placeholder { visibility: hidden; }
+.lo-vdelete .icon svg, .lo-vadd .icon svg { width: 14px; height: 14px; }
+.lo-vfoot { margin-left: 16px; }
+.lo-row .lo-vadd { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 12px; }
+.lo-variants-hint { margin: 8px 0 0; }
+/* 手で選んだレイアウトを、その幅で表示しているとき(app.js の applyPreviewWidth)。
+   背景ごとその幅のウィンドウに見えるよう、背景の層を絞って影を付け、外側を暗くする */
+body.preview-window { background: color-mix(in srgb, var(--bg) 35%, #000); }
+body.preview-window #page-bg {
+  display: block; left: 50%; right: auto; width: var(--preview-width); transform: translateX(-50%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / .35), 0 16px 60px rgb(0 0 0 / .6), 0 4px 16px rgb(0 0 0 / .4);
+}
+body.preview-window #page-bg[data-type="theme"] { background: var(--bg); }
+.grid-stack.preview-width { margin-inline: auto; margin-top: 26px; }
+.grid-stack.preview-width::before {
+  content: attr(data-preview); position: absolute; top: -26px; left: 0;
+  color: var(--text-muted); font-size: 12px; white-space: nowrap;
+}
+.tb-menu-label { margin: 4px 10px 2px; color: var(--text-muted); font-size: 11px; }
+.tb-menu-note { flex: none; color: var(--text-muted); font-size: 11px; }
+.tb-menu-item[aria-checked="true"] .tb-menu-note { color: inherit; opacity: .8; } /* 選んでいる項目はアクセントカラーの地なので、文字の色に合わせる */
 .lo-current { flex: none; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12px; }
 .lo-row .btn { flex: none; padding: 6px 10px; }
 .lo-row .btn:disabled, .lo-add:disabled { opacity: .4; cursor: default; }

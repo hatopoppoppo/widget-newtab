@@ -5,7 +5,8 @@ import { t, applyI18n } from './i18n.js';
 import { gradientEditor } from './gradient.js';
 import { applyTheme } from './theme.js';
 import { applyBackground, backgroundImageField, saveBackgroundPhoto, onBackgroundPhotoChange } from './page-bg.js';
-import { layoutListField } from './layouts-ui.js';
+import { layoutListField, variantName } from './layouts-ui.js';
+import { packLayout, mergeWidgets, sameWidgets } from './layout-pack.js';
 import * as photos from './photo-store.js';
 import { checkForUpdate, dismissUpdate, reloadExtension, helperAvailable, updateWithHelper, ZIP_URL, REPO_URL, FEEDBACK_URL } from './update.js';
 
@@ -73,8 +74,26 @@ const PREF_FIELDS = [
 ];
 const DEVICE_KEYS = PREF_FIELDS.filter((f) => f.device).map((f) => f.key);
 
-// グリッドは 24 列の正方形マス(1 マスの大きさはウィンドウ幅 / 24。1400px なら約 57px)
+// グリッドは正方形マス。1 マスの大きさはウィンドウ幅 / 列の数。
+// プロファイル(コードでは「レイアウト」lid)は、ウィンドウの幅に合わせたレイアウト(variant)をいくつか持てる。
+// 「○px以下」に当てはまるうち、いちばん狭い条件のレイアウトを表示し、どれにも当てはまらなければ先頭のレイアウトにする。
+// メニューから手で選んだレイアウトは、幅が条件の境目を越えるまでそのまま。ウィジェットの組はどのレイアウトでも同じで、並べ方と列の数だけが違う
 const COLUMNS = 24;
+const activeVariants = () => store.variantsOf(layouts.find((l) => l.id === activeLid));
+const variantDef = (vid) => activeVariants().find((v) => v.id === vid) ?? activeVariants()[0];
+const columnsFor = (vid) => variantDef(vid).columns ?? COLUMNS;
+function autoVariant(width = innerWidth) {
+  const vs = activeVariants();
+  return vs.filter((v) => v.maxWidth && width <= v.maxWidth).sort((a, b) => a.maxWidth - b.maxWidth)[0]?.id ?? vs[0].id;
+}
+// 保存されている配置。先頭以外でまだ無いものは、先頭のレイアウトの配置をその列の数に詰めて使う(そのレイアウトで動かすまでは保存しない)
+const storedOf = (vid) => (vid === store.DEFAULT_VARIANT ? activeData.layout : activeData.variants[vid] ?? null);
+const arrangementOf = (vid) => storedOf(vid) ?? packLayout(activeData.layout, columnsFor(vid));
+function setStored(vid, layout) {
+  if (vid === store.DEFAULT_VARIANT) activeData.layout = layout;
+  else activeData.variants[vid] = layout;
+}
+const dataOf = (d) => ({ layout: d.layout, variants: { ...d.variants } });
 
 const DEFAULT_LAYOUT = [
   { type: 'clock', x: 0, y: 0, w: 6, h: 2 },
@@ -89,6 +108,9 @@ let grid;
 let prefs;           // 表示しているレイアウトの全体設定
 let layouts = [];    // [{ id, name }]
 let activeLid = null; // 表示しているレイアウト(PC ごと)
+let variant = store.DEFAULT_VARIANT; // 表示しているプロファイルの中のレイアウト
+let manualVariant = null; // メニューから手で選んだレイアウト { id, auto(選んだときに幅で選ばれていたもの) }
+let activeData = { layout: [], variants: {} }; // 表示しているプロファイルの保存されている配置
 let editing = false;
 let lastLayoutJSON = '';
 
@@ -97,6 +119,7 @@ let lastLayoutJSON = '';
 // 拡大縮小・ウィンドウの幅を変えても、マスと一緒に中身も同じ比率で伸縮するので、見た目が崩れない。
 // zoom の中では offsetHeight などは掛ける前の値、getBoundingClientRect は掛けた後の値になることに注意
 const BASE_GRID_WIDTH = 1832;
+const BASE_CELL = BASE_GRID_WIDTH / COLUMNS; // 基準の 1 マスの大きさ。12 列のレイアウトでは、マスが大きい分だけ中身も大きく描く
 let scale = 1;
 // 全体設定の「文字の大きさ」(PC ごと)。scale に掛ける。マスの大きさは変えないので、大きくすると中身が詰まる
 let uiScale = 1;
@@ -115,10 +138,11 @@ async function init() {
   }
   layouts = data.layouts;
   activeLid = await store.loadActiveLayout(layouts);
+  variant = autoVariant();
   prefs = data.layoutData[activeLid].prefs;
 
   grid = GridStack.init({
-    column: COLUMNS,
+    column: columnsFor(variant),
     cellHeight: 'auto',         // 列の幅と同じ高さ(正方形)。ウィンドウのリサイズに追従する
     margin: prefs.margin,
     mode: 'float',              // 隙間を詰めず、置いた場所に留める
@@ -145,7 +169,8 @@ async function init() {
   uiScale = (Number((await store.loadDevicePrefs()).uiScale) || 100) / 100;
   applyPrefs(prefs);
 
-  const layout = data.layoutData[activeLid].layout;
+  activeData = dataOf(data.layoutData[activeLid]);
+  const layout = arrangementOf(variant);
   lastLayoutJSON = JSON.stringify(layout);
   mountAll(() => {
     for (const item of layout) mountWidget(item, data.configs[item.id]);
@@ -167,7 +192,15 @@ async function init() {
   bindKeyboard();
   store.onExternalChange({
     layouts: onRemoteLayouts,
-    layout: (lid, layout) => { if (lid === activeLid) onRemoteLayout(layout); },
+    layout: (lid, layout, vid) => {
+      if (lid !== activeLid) return;
+      setStored(vid, layout);
+      // 表示中のレイアウトの配置が消えた: レイアウトごと消したので、一覧の変更(onRemoteLayouts)で切り替える。
+      // ここで並べ直すと、消したレイアウトの配置をまた保存してしまう
+      if (!layout) return;
+      // 表示中のレイアウトか、表示中のレイアウトの元になっている先頭のレイアウトが変わった
+      if (vid === variant || (vid === store.DEFAULT_VARIANT && !storedOf(variant))) onRemoteLayout(arrangementOf(variant));
+    },
     prefs: (lid, p) => { if (lid === activeLid) onRemotePrefs(p); },
     config: onRemoteConfig,
     data: onDataChange,
@@ -179,8 +212,55 @@ async function init() {
   let resizeTimer;
   addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(relayout, 200);
+    resizeTimer = setTimeout(() => {
+      applyVariant();
+      relayout();
+    }, 200);
   });
+}
+
+// ウィンドウの幅に合わせて、プロファイルの中のレイアウトを切り替える。
+// force: 条件やマス数が変わったかもしれないので、同じレイアウトでも並べ直す(変わっていなければ何もしない)
+function applyVariant({ force = false } = {}) {
+  const auto = autoVariant();
+  if (manualVariant && (manualVariant.auto !== auto || !activeVariants().some((v) => v.id === manualVariant.id))) manualVariant = null;
+  const next = manualVariant?.id ?? auto;
+  const previewChanged = applyPreviewWidth(manualVariant ? next : null);
+  if (next === variant && !force && !previewChanged) return;
+  variant = next;
+  onRemoteLayout(arrangementOf(next));
+  if (previewChanged) relayout(); // グリッドの幅が変わったので、マスの大きさに合わせて中身を伸縮し直す
+  renderLayoutSelect();
+}
+
+// 手で選んだレイアウトに幅の条件があり、今のウィンドウの方が広いときは、グリッドをその幅に絞って中央に表示する。
+// そのレイアウトを使うときの見た目(マスと中身の大きさ)のまま編集できるように。戻り値: 幅が変わったか
+const PAGE_PADDING_X = 32; // .page の左右の余白
+function applyPreviewWidth(vid) {
+  const width = vid ? variantDef(vid).maxWidth : null;
+  const preview = width && width < innerWidth ? width : null;
+  const value = preview ? `${preview - PAGE_PADDING_X}px` : '';
+  if (grid.el.style.maxWidth === value) return false;
+  grid.el.style.maxWidth = value;
+  grid.el.classList.toggle('preview-width', !!preview);
+  document.body.classList.toggle('preview-window', !!preview);
+  document.body.style.setProperty('--preview-width', preview ? `${preview}px` : '');
+  if (preview) grid.el.dataset.preview = t('layouts_preview_width', { width: preview });
+  else delete grid.el.dataset.preview;
+  grid.cellHeight('auto'); // マスの高さをすぐに新しい幅に合わせる
+  return true;
+}
+
+// メニューから手で選ぶ(幅が条件の境目を越えるまでそのまま)
+function chooseVariant(vid) {
+  manualVariant = { id: vid, auto: autoVariant() };
+  applyVariant();
+}
+
+// 列の数を変える(gridstack に並べ替えさせず、そのあとで保存した位置に置く)
+function setColumns(n) {
+  if (grid.getColumn() === n) return;
+  adjust(() => grid.column(n, 'none'));
 }
 
 // 12 列・固定の行の高さ(gridVersion 1)のレイアウトを、24 列の正方形マスに変換する。
@@ -214,8 +294,8 @@ function mountWidget(item, storedConfig) {
   const node = grid.addWidget({
     id: item.id,
     x: item.x, y: item.y,
-    w: item.w ?? size.w, h: item.h ?? size.h,
-    minW: size.minW, minH: size.minH, maxW: size.maxW, maxH: size.maxH,
+    w: Math.min(item.w ?? size.w, grid.getColumn()), h: item.h ?? size.h,
+    minW: Math.min(size.minW ?? 1, grid.getColumn()), minH: size.minH, maxW: size.maxW, maxH: size.maxH,
     autoPosition: item.x == null || item.y == null,
   });
   const content = node.querySelector('.grid-stack-item-content');
@@ -289,7 +369,7 @@ function startWidget(inst) {
 // 画面の大きさによらない最小サイズ(マス数): ウィジェット定義の最小サイズと setMinSize の大きい方
 function fixedMinSize(inst) {
   return {
-    minW: Math.max(inst.def?.size.minW ?? 1, inst.minGridSize?.w ?? 1),
+    minW: Math.min(grid.getColumn(), Math.max(inst.def?.size.minW ?? 1, inst.minGridSize?.w ?? 1)),
     minH: Math.max(inst.def?.size.minH ?? 1, inst.minGridSize?.h ?? 1),
   };
 }
@@ -487,7 +567,7 @@ function applyPrefs(p) {
 function updateScale(p = prefs) {
   const width = grid.el.clientWidth;
   if (!width) return;
-  const gridScale = width / BASE_GRID_WIDTH;
+  const gridScale = width / grid.getColumn() / BASE_CELL;
   scale = gridScale * uiScale;
   grid.el.style.setProperty('--wg-scale', scale);
   const margin = Math.round(p.margin * gridScale * 100) / 100;
@@ -561,7 +641,16 @@ function saveLayout() {
   const json = JSON.stringify(layout);
   if (json === lastLayoutJSON) return;
   lastLayoutJSON = json;
-  store.saveLayout(activeLid, layout);
+  store.saveArrangement(activeLid, variant, layout);
+  setStored(variant, layout);
+  // ウィジェットを足した・外したときは、ほかのレイアウトにも反映する(まだ保存していないレイアウトは、使うときに先頭のレイアウトから作る)
+  for (const v of activeVariants()) {
+    const other = v.id === variant ? null : storedOf(v.id);
+    if (!other || sameWidgets(other, layout)) continue;
+    const merged = mergeWidgets(other, layout, v.columns ?? COLUMNS);
+    setStored(v.id, merged);
+    store.saveArrangement(activeLid, v.id, merged);
+  }
 }
 
 async function exportSettings() {
@@ -591,13 +680,15 @@ async function importSettings() {
 
 async function onRemoteLayout(layout, configs = null) {
   const json = JSON.stringify(layout);
-  if (json === lastLayoutJSON) return; // 自分の書き込み
+  if (json === lastLayoutJSON && grid.getColumn() === columnsFor(variant)) return; // 自分の書き込み
   lastLayoutJSON = json;
 
   const ids = new Set(layout.map((i) => i.id));
   const added = layout.filter((i) => !instances.has(i.id));
   if (added.length) configs ??= (await store.loadAll()).configs;
 
+  setColumns(columnsFor(variant));
+  updateScale();
   mountAll(() => {
     for (const inst of [...instances.values()]) if (!ids.has(inst.id)) destroyWidget(inst);
     // 残すウィジェットを先に動かしてから、新しいウィジェットを置く。逆だと、まだ前の位置にいるウィジェットと重なって
@@ -614,10 +705,11 @@ async function onRemoteLayout(layout, configs = null) {
 }
 
 // レイアウトの一覧が変わった(他のタブ・PC で追加・削除・名前の変更)
-function onRemoteLayouts(list) {
+async function onRemoteLayouts(list) {
   if (!list.length) return;
   layouts = list;
-  if (!layouts.some((l) => l.id === activeLid)) switchLayout(layouts[0].id);
+  if (!layouts.some((l) => l.id === activeLid)) await switchLayout(layouts[0].id);
+  else applyVariant({ force: true }); // プロファイルの中のレイアウトの条件やマス数が変わったかもしれない
   renderLayoutSelect();
 }
 
@@ -630,8 +722,12 @@ async function switchLayout(lid, { remember = true } = {}) {
   // ここから並べ替えが終わるまで await しない(途中で前のレイアウトのウィジェットを、新しいレイアウトとして保存しないように)
   activeLid = lid;
   layouts = data.layouts;
+  activeData = dataOf(data.layoutData[lid]);
+  manualVariant = null;
+  applyPreviewWidth(null);
+  variant = autoVariant();
   if (remember) store.saveActiveLayout(lid);
-  onRemoteLayout(data.layoutData[lid].layout, data.configs);
+  onRemoteLayout(arrangementOf(variant), data.configs);
   // 間隔などは並べ替えた後に反映する(最小サイズの補正で保存するのは、新しいレイアウトのウィジェットにする)
   prefs = data.layoutData[lid].prefs;
   applyPrefs(prefs);
@@ -670,7 +766,11 @@ function onRemotePrefs(p) {
 
 // ツールバーの「レイアウト」: 表示中のレイアウト名と、切り替え・管理のメニュー
 function renderLayoutSelect() {
-  $('#layout-current').textContent = layouts.find((l) => l.id === activeLid)?.name ?? '';
+  const profile = layouts.find((l) => l.id === activeLid);
+  const variants = activeVariants();
+  $('#layout-current').textContent = variants.length > 1
+    ? t('layouts_current_label', { profile: profile?.name ?? '', layout: variantName(variantDef(variant)) })
+    : profile?.name ?? '';
   const menu = $('#layout-menu');
   const items = layouts.map((l) => {
     const b = el('button', { type: 'button', className: 'tb-menu-item layout-opt', role: 'menuitemradio' },
@@ -690,13 +790,32 @@ function renderLayoutSelect() {
     menu.hidePopover();
     openLayouts();
   });
-  menu.replaceChildren(...items, el('hr', { className: 'tb-menu-sep' }), manage);
+  // 表示中のプロファイルの中のレイアウト(手で選ぶと、幅が条件の境目を越えるまでそのまま)
+  const variantItems = variants.length < 2 ? [] : [
+    el('hr', { className: 'tb-menu-sep' }),
+    el('p', { className: 'tb-menu-label', textContent: t('layouts_menu_variants', { name: profile?.name ?? '' }) }),
+    ...variants.map((v, i) => {
+      const note = v.maxWidth ? t('layouts_width_note', { width: v.maxWidth }) : i === 0 ? t('layouts_variant_fallback') : '';
+      const b = el('button', { type: 'button', className: 'tb-menu-item variant-opt', role: 'menuitemradio' },
+        el('span', { className: 'tb-menu-name', textContent: variantName(v) }),
+        el('span', { className: 'tb-menu-note', textContent: note }),
+        v.id === variant ? icon('check') : null);
+      b.setAttribute('aria-checked', String(v.id === variant));
+      b.dataset.id = v.id;
+      b.addEventListener('click', () => {
+        menu.hidePopover();
+        chooseVariant(v.id);
+      });
+      return b;
+    }),
+  ];
+  menu.replaceChildren(...items, ...variantItems, el('hr', { className: 'tb-menu-sep' }), manage);
 }
 
 async function openLayouts() {
   const values = await editSettings({
     title: t('layouts_title'),
-    fields: [{ key: 'layouts', label: t('layouts_list'), type: 'custom', hint: t('layouts_hint'), create: () => layoutListField(layouts, activeLid) }],
+    fields: [{ key: 'layouts', label: t('layouts_list'), type: 'custom', hint: t('layouts_hint'), create: () => layoutListField(layouts, activeLid, innerWidth) }],
     values: {},
   });
   if (!values) return;
@@ -704,15 +823,20 @@ async function openLayouts() {
   const next = [];
   for (const row of values.layouts) {
     if (!row.from) {
-      next.push({ id: row.id, name: row.name });
+      await saveVariants(row.id, row.variants, row.id, data);
+      next.push(profileEntry(row.id, row));
       continue;
     }
-    // 新しく作ったもの: 空のレイアウトは今の見た目を引き継ぐ。複製はウィジェットの配置(共有)と見た目、背景の画像も写す
+    // 新しく作ったもの: 空のプロファイルは今の見た目を引き継ぐ。複製はウィジェットの配置(共有。どのレイアウトも)と見た目、背景の画像も写す
     const id = newId();
-    const source = row.from.startsWith('copy:') ? data.layoutData[row.from.slice(5)] : null;
-    await store.saveLayoutData(id, source ?? { layout: [], prefs });
-    if (source) await photos.copyOwner(store.backgroundOwner(row.from.slice(5)), store.backgroundOwner(id)).catch((err) => console.error(err));
-    next.push({ id, name: row.name });
+    const sourceId = row.from.startsWith('copy:') ? row.from.slice(5) : null;
+    const source = sourceId ? data.layoutData[sourceId] : null;
+    await store.saveLayoutData(id, { layout: source?.layout ?? [], prefs: source?.prefs ?? prefs });
+    if (source) {
+      await saveVariants(id, row.variants, sourceId, data);
+      await photos.copyOwner(store.backgroundOwner(sourceId), store.backgroundOwner(id)).catch((err) => console.error(err));
+    }
+    next.push(profileEntry(id, row));
   }
   // 消したレイアウト。そこにだけ置いていたウィジェットは、設定と中身も消す
   const removed = data.layouts.filter((l) => !next.some((n) => n.id === l.id));
@@ -726,7 +850,32 @@ async function openLayouts() {
   layouts = next;
   await store.saveLayoutList(next);
   if (!next.some((l) => l.id === activeLid)) await switchLayout(next[0].id);
+  else {
+    activeData = dataOf((await store.loadAll()).layoutData[activeLid]);
+    applyVariant({ force: true });
+  }
   renderLayoutSelect();
+}
+
+// 保存するプロファイル。中のレイアウトが 24 列の 1 つだけで名前も無ければ、variants は書かない
+function profileEntry(id, { name, variants }) {
+  const plain = variants.length === 1 && variants[0].columns === COLUMNS && !variants[0].name;
+  return { id, name, ...(plain ? {} : { variants: variants.map(({ id: vid, name: vname, columns, maxWidth }) => ({ id: vid, name: vname, columns, ...(maxWidth ? { maxWidth } : {}) })) }) };
+}
+
+// プロファイル id の中のレイアウトの配置を書く。元(sourceId。複製でなければ同じ id)の配置を写し、
+// マス数を変えたものは新しい列の数に詰め直す。元にあって無くなったレイアウトの配置は消す
+async function saveVariants(id, variants, sourceId, data) {
+  const before = store.variantsOf(data.layouts.find((l) => l.id === sourceId));
+  const source = data.layoutData[sourceId];
+  for (const v of variants) {
+    const old = before.find((o) => o.id === v.id);
+    const stored = !old ? null : v.id === store.DEFAULT_VARIANT ? source.layout : source.variants[v.id];
+    if (!stored) continue;
+    if ((old.columns ?? COLUMNS) !== v.columns) await store.saveArrangement(id, v.id, packLayout(stored, v.columns));
+    else if (id !== sourceId) await store.saveArrangement(id, v.id, stored);
+  }
+  if (id === sourceId) for (const o of before) if (!variants.some((v) => v.id === o.id)) await store.removeArrangement(id, o.id);
 }
 
 // ---------- 更新 ----------

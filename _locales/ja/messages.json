@@ -1455,28 +1455,28 @@
     "message": "メイン"
   },
   "toolbar_layouts": {
-    "message": "レイアウト"
+    "message": "プロファイル"
   },
   "toolbar_layouts_title": {
-    "message": "レイアウトの切り替え・追加・複製・名前の変更・削除"
+    "message": "プロファイルの切り替え・追加・複製・名前の変更・削除"
   },
   "layouts_title": {
-    "message": "レイアウト"
+    "message": "プロファイル"
   },
   "layouts_list": {
-    "message": "レイアウトの一覧"
+    "message": "プロファイルの一覧"
   },
   "layouts_hint": {
-    "message": "レイアウトごとに、ウィジェットの配置と全体設定(テーマ・色・背景)を切り替えられます。同じウィジェットを複数のレイアウトに置くと、中身は共有されます。表示するレイアウトはPCごとに選べます。"
+    "message": "プロファイルごとに、ウィジェットと全体設定(テーマ・色・背景)をまとめて切り替えられます(仕事用・娯楽用など)。同じウィジェットを複数のプロファイルに置くと、中身は共有されます。表示するプロファイルはPCごとに選べます。"
   },
   "layouts_name": {
-    "message": "レイアウトの名前"
+    "message": "プロファイルの名前"
   },
   "layouts_new": {
-    "message": "新しいレイアウト"
+    "message": "新しいプロファイル"
   },
   "layouts_new_name": {
-    "message": "レイアウト{n}"
+    "message": "プロファイル{n}"
   },
   "layouts_copy_name": {
     "message": "{name}のコピー"
@@ -1488,13 +1488,13 @@
     "message": "表示中"
   },
   "layouts_max": {
-    "message": "レイアウトは{n}個までです。"
+    "message": "プロファイルは{n}個までです。"
   },
   "widget_confirm_remove_shared": {
-    "message": "「{name}」をこのレイアウトから外しますか？ほかのレイアウト({layouts})には残ります。"
+    "message": "「{name}」をこのプロファイルから外しますか？ほかのプロファイル({layouts})には残ります。"
   },
   "picker_shared": {
-    "message": "ほかのレイアウトのウィジェット"
+    "message": "ほかのプロファイルのウィジェット"
   },
   "picker_shared_hint": {
     "message": "同じウィジェットを置くと、中身は共有されます。"
@@ -1502,8 +1502,53 @@
   "picker_shared_in": {
     "message": "{layouts}に配置"
   },
+  "layouts_variant_default": {
+    "message": "通常"
+  },
+  "layouts_variant_new_name": {
+    "message": "レイアウト{n}"
+  },
+  "layouts_variant_name": {
+    "message": "レイアウトの名前"
+  },
+  "layouts_variant_add": {
+    "message": "レイアウトを追加"
+  },
+  "layouts_variant_max": {
+    "message": "レイアウトは1つのプロファイルに{n}個までです。"
+  },
+  "layouts_variant_fallback": {
+    "message": "ほかの条件に当てはまらないとき"
+  },
+  "layouts_columns": {
+    "message": "マス数"
+  },
+  "layouts_columns_option": {
+    "message": "{n}マス"
+  },
+  "layouts_width_label": {
+    "message": "このレイアウトにするウィンドウの幅"
+  },
+  "layouts_width_unit": {
+    "message": "px以下"
+  },
+  "layouts_width_note": {
+    "message": "{width}px以下"
+  },
+  "layouts_variants_hint": {
+    "message": "プロファイルごとに、ウィンドウの幅に合わせたレイアウトを{n}個まで持てます。ウィンドウの幅が「○px以下」に当てはまるうち、いちばん狭い条件のレイアウトを表示し、どれにも当てはまらなければ最初のレイアウトにします。ウィジェットはどのレイアウトでも同じで、並べ方とマス数だけが違います。新しいレイアウトは最初のレイアウトを詰めて作り、そのレイアウトで動かすと別に保存されます。編集するレイアウトは「プロファイル」のメニューから選べます。今のウィンドウの幅は{width}pxです。"
+  },
+  "layouts_menu_variants": {
+    "message": "{name}のレイアウト"
+  },
+  "layouts_current_label": {
+    "message": "{profile}/{layout}"
+  },
+  "layouts_preview_width": {
+    "message": "ウィンドウの幅{width}pxのときの見た目で表示しています"
+  },
   "layouts_manage": {
-    "message": "レイアウトを管理…"
+    "message": "プロファイルを管理…"
   },
   "update_available": {
     "message": "新しいバージョン{version}"
